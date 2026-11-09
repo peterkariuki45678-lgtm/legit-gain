@@ -9,19 +9,24 @@ const path = require("path");
 const app = express();
 app.use(express.json());
 app.use(cors());
-
-// Serve static frontend files from the "public" folder
 app.use(express.static(path.join(__dirname, "public")));
 
-// Connect to Cloud MongoDB Database
-const mongoUri = process.env.MONGO_URI;
-if (mongoUri) {
-  mongoose.connect(mongoUri)
-    .then(() => console.log("Database connected successfully"))
-    .catch(err => console.error("Database connection error:", err));
-} else {
-  console.log("Warning: MONGO_URI environment variable is missing!");
-}
+// Connect to MongoDB Atlas
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("Database connected successfully"))
+  .catch(err => console.error("Database connection error:", err));
+
+// Database Schemas
+const UserSchema = new mongoose.Schema({
+  phone: { type: String, unique: true, required: true },
+  balance: { type: Number, default: 0 },
+  surveyCompleted: { type: Boolean, default: false },
+  unlockedTasks: [Number],
+  referralCode: String,
+  referredBy: String,
+  createdAt: { type: Date, default: Date.now }
+});
+const User = mongoose.model("User", UserSchema);
 
 const TransactionSchema = new mongoose.Schema({
   phoneNumber: String,
@@ -38,26 +43,54 @@ const AdminSchema = new mongoose.Schema({
 });
 const Admin = mongoose.model("Admin", AdminSchema);
 
-// --- DARAJA ACCESS TOKEN GENERATOR ---
+// Daraja Token Generator
 async function getDarajaAccessToken() {
   const consumerKey = process.env.DARAJA_CONSUMER_KEY;
   const consumerSecret = process.env.DARAJA_CONSUMER_SECRET;
   const buffer = Buffer.from(`${consumerKey}:${consumerSecret}`);
   const auth = buffer.toString("base64");
 
-  try {
-    const response = await axios.get(
-      "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
-      { headers: { Authorization: `Basic ${auth}` } }
-    );
-    return response.data.access_token;
-  } catch (error) {
-    console.error("Daraja Token Error:", error.response?.data || error.message);
-    throw new Error("Failed to connect to Safaricom Daraja");
-  }
+  const response = await axios.get(
+    "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
+    { headers: { Authorization: `Basic ${auth}` } }
+  );
+  return response.data.access_token;
 }
 
-// --- 1. USER: TRIGGER M-PESA STK PUSH ---
+// --- USER REGISTRATION & SURVEY SUBMISSION ---
+app.post("/api/register-survey", async (req, res) => {
+  const { phone, answers, referralCode } = req.body;
+  try {
+    let user = await User.findOne({ phone });
+    if (!user) {
+      const generatedRef = "LG-" + Math.floor(1000 + Math.random() * 9000);
+      user = new User({ phone, referralCode: generatedRef });
+      
+      if (referralCode) {
+        const referrer = await User.findOne({ referralCode });
+        if (referrer) {
+          referrer.balance += 500; // Referral bonus
+          await referrer.save();
+          user.referredBy = referralCode;
+        }
+      }
+    }
+
+    if (!user.surveyCompleted) {
+      // 9 survey questions * 40 KES = 360 KES credited
+      const surveyEarnings = 9 * 40; 
+      user.balance += surveyEarnings;
+      user.surveyCompleted = true;
+    }
+
+    await user.save();
+    res.json({ success: true, message: "Survey completed! Credited to your account.", user });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// --- M-PESA STK PUSH (UNLOCK TASK WITH 40%) ---
 app.post("/api/unlock-task", async (req, res) => {
   let { phoneNumber, amount } = req.body;
   if (phoneNumber.startsWith("0")) {
@@ -78,13 +111,13 @@ app.post("/api/unlock-task", async (req, res) => {
         Password: password,
         Timestamp: timestamp,
         TransactionType: "CustomerPayBillOnline",
-        Amount: amount,
+        Amount: amount, // Dynamic 40% amount
         PartyA: phoneNumber,
         PartyB: shortCode,
         PhoneNumber: phoneNumber,
-        CallBackURL: "https://legit-gain.onrender.com/api/mpesa/callback",
-        AccountReference: "TaskUnlock",
-        TransactionDesc: "Unlock Task Fee"
+        CallBackURL: "https://mydomain.com/api/mpesa/callback",
+        AccountReference: "LegitGainUnlock",
+        TransactionDesc: "Unlock Hotel Review Task"
       },
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
@@ -98,7 +131,7 @@ app.post("/api/unlock-task", async (req, res) => {
 
     res.json({
       success: true,
-      message: "Please check your phone. Enter your M-Pesa phone number to unlock the task.",
+      message: `Prompt sent to ${phoneNumber} for KES ${amount}. Enter your M-Pesa PIN.`,
       checkoutRequestId: stkResponse.data.CheckoutRequestID
     });
   } catch (error) {
@@ -107,11 +140,11 @@ app.post("/api/unlock-task", async (req, res) => {
   }
 });
 
-// --- 2. ADMIN: SECURE LOGIN ---
+// --- ADMIN LOGIN ---
 app.post("/api/admin/login", async (req, res) => {
   const { username, password } = req.body;
   try {
-    let admin = await Admin.findOne({ username });
+    let admin = await Admin.findOne({ username: "admin" });
     if (!admin) {
       const hash = await bcrypt.hash("AdminSecret2026!", 10);
       admin = await Admin.create({ username: "admin", passwordHash: hash });
@@ -120,24 +153,23 @@ app.post("/api/admin/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, admin.passwordHash);
     if (!isMatch) return res.status(400).json({ success: false, message: "Invalid credentials" });
 
-    res.json({ success: true, message: "Welcome Admin", token: "admin_session_token_xyz" });
+    res.json({ success: true, token: "admin_token_secure" });
   } catch (err) {
     res.status(500).json({ success: false, error: "Server error" });
   }
 });
 
-// --- 3. ADMIN: DASHBOARD BALANCE ---
+// --- ADMIN DASHBOARD BALANCE ---
 app.get("/api/admin/dashboard", async (req, res) => {
   try {
-    const successfulTxs = await Transaction.find({ status: "Success" });
-    const totalBalance = successfulTxs.reduce((sum, tx) => sum + tx.amount, 0);
-    res.json({ success: true, totalBalance, transactions: successfulTxs });
+    const txs = await Transaction.find({ status: "Success" });
+    const totalBalance = txs.reduce((sum, t) => sum + t.amount, 0);
+    res.json({ success: true, totalBalance, transactions: txs });
   } catch (err) {
-    res.status(500).json({ success: false, error: "Error fetching balance" });
+    res.status(500).json({ success: false, error: "Failed to load dashboard" });
   }
 });
 
-// Fallback to serve index.html for root path
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
