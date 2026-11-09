@@ -2,85 +2,164 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Task Unlock & Admin Center</title>
+    <title>Legit Gain - Hotel Reviews & Earning Platform</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; text-align: center; }
-        .card { background: white; max-width: 400px; margin: 30px auto; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input, button { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; }
-        button { background: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background: #218838; }
-        .admin-box { background: #343a40; color: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: 40px auto; text-align: left; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        button { background: #27ae60; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #219653; }
+        .hidden { display: none; }
+        .hotel-card { background: #fafafa; border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        .admin-section { margin-top: 50px; background: #2c3e50; color: white; padding: 20px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-    <h1>Unlock Your Task Instantly</h1>
-    
-    <div class="card">
-        <h3>Task #1: Premium Material</h3>
-        <p>Pay KES 50 to unlock full instructions and answers.</p>
-        <input type="text" id="phone" placeholder="Enter your M-Pesa phone number (e.g. 0712345678)">
-        <button onclick="unlockTask()">Pay & Unlock Task</button>
-        <p id="status-msg" style="font-weight: bold; color: #007bff;"></p>
+<div class="container">
+    <h1>💼 Legit Gain</h1>
+
+    <!-- STEP 1: SIGN UP & SURVEY -->
+    <div id="step-signup">
+        <h3>Step 1: Get Started & Earn Free Survey Bonus</h3>
+        <p>Register with your Safaricom Number and answer quick questions to earn KES 360 instantly!</p>
+        <input type="text" id="phone" placeholder="Enter Safaricom Number (e.g. 0712345678)">
+        <input type="text" id="ref-code" placeholder="Referral Code (Optional)">
+        
+        <h4>Survey Questions</h4>
+        <label>1. Your Age Group:</label>
+        <select id="q1"><option>18 - 25</option><option>26 - 40</option><option>41+</option></select>
+
+        <label>2. Kenyan County:</label>
+        <select id="q2"><option>Nairobi</option><option>Mombasa</option><option>Kiambu</option><option>Nakuru</option><option>Kisumu</option></select>
+
+        <label>3. Education Level:</label>
+        <select id="q3"><option>Certificate / Diploma</option><option>Bachelor's Degree</option><option>Postgraduate</option></select>
+
+        <label>4. Monthly Salary (KES):</label>
+        <select id="q4"><option>Below 20,000</option><option>20,000 - 50,000</option><option>50,000+</option></select>
+
+        <button onclick="submitSurvey()">Submit Survey & Claim KES 360</button>
     </div>
 
-    <div class="admin-box">
-        <h3>Admin Center Login</h3>
-        <input type="text" id="admin-user" placeholder="Username (default: admin)">
-        <input type="password" id="admin-pass" placeholder="Password">
-        <button onclick="adminLogin()">Login to Admin Panel</button>
-        <div id="admin-dashboard" style="display:none; margin-top: 15px;">
-            <h4>Admin Dashboard</h4>
-            <p><strong>Total Wallet Balance:</strong> KES <span id="wallet-balance">0</span></p>
-            <button style="background: #ffc107; color: black;" onclick="alert('Withdrawal request submitted to your bank/M-Pesa!')">Withdraw Funds</button>
+    <!-- STEP 2: USER DASHBOARD & HOTELS -->
+    <div id="step-dashboard" class="hidden">
+        <h2>Welcome to Your Dashboard</h2>
+        <p><strong>Account Balance:</strong> KES <span id="user-balance">0</span></p>
+        <p><strong>Your Referral Link:</strong> <span id="ref-link" style="color: blue;"></span></p>
+        <hr>
+        <h3>Available Hotel Review Tasks</h3>
+        <div id="hotel-list">
+            <!-- Hotel 1 -->
+            <div class="hotel-card">
+                <h4>Sarova Stanley Hotel Review</h4>
+                <p>Reward: <strong>KES 1,000</strong> | Unlock Fee (40%): <strong>KES 400</strong></p>
+                <button onclick="unlockTask(400, 'Sarova Stanley')">Unlock Task (Pay KES 400)</button>
+            </div>
+            <!-- Hotel 2 -->
+            <div class="hotel-card">
+                <h4>Villa Rosa Kempinski Review</h4>
+                <p>Reward: <strong>KES 1,500</strong> | Unlock Fee (40%): <strong>KES 600</strong></p>
+                <button onclick="unlockTask(600, 'Villa Rosa Kempinski')">Unlock Task (Pay KES 600)</button>
+            </div>
+        </div>
+
+        <hr>
+        <h3>Withdraw Funds</h3>
+        <input type="text" id="withdraw-name" placeholder="Enter Full Name for M-Pesa/Bank">
+        <input type="number" id="withdraw-amount" placeholder="Enter amount to withdraw">
+        <button style="background: #2980b9;" onclick="requestWithdrawal()">Withdraw to M-Pesa</button>
+        <p id="withdrawal-msg" style="font-weight: bold;"></p>
+    </div>
+
+    <!-- ADMIN CENTER -->
+    <div class="admin-section">
+        <h3>🔒 Admin Control Center</h3>
+        <input type="text" id="admin-user" placeholder="Admin Username">
+        <input type="password" id="admin-pass" placeholder="Admin Password">
+        <button style="background: #e74c3c;" onclick="adminLogin()">Login to Admin Panel</button>
+        
+        <div id="admin-panel" class="hidden" style="margin-top: 15px;">
+            <h4>Admin Wallet Summary</h4>
+            <p><strong>Total Platform Earnings from Task Unlocks:</strong> KES <span id="admin-total">0</span></p>
+            <button style="background: #f1c40f; color: black;" onclick="alert('Withdrawal push to admin bank/M-Pesa initiated!')">Withdraw Admin Funds</button>
         </div>
     </div>
+</div>
 
-    <script>
-        async function unlockTask() {
-            const phone = document.getElementById('phone').value;
-            const msg = document.getElementById('status-msg');
-            msg.innerText = "Sending M-Pesa prompt to your phone...";
+<script>
+    let currentUserPhone = "";
 
-            const res = await fetch('/api/unlock-task', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phoneNumber: phone, amount: 1 }) // 1 KES for sandbox testing
-            });
-            const data = await res.json();
-            if(data.success) {
-                msg.innerText = data.message;
-            } else {
-                msg.innerText = "Error triggering prompt.";
-            }
+    async function submitSurvey() {
+        const phone = document.getElementById('phone').value;
+        const refCode = document.getElementById('ref-code').value;
+        if(!phone) { alert("Please enter your Safaricom phone number."); return; }
+
+        currentUserPhone = phone;
+        const res = await fetch('/api/register-survey', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, referralCode: refCode })
+        });
+        const data = await res.json();
+        if(data.success) {
+            alert(data.message);
+            document.getElementById('step-signup').classList.add('hidden');
+            document.getElementById('step-dashboard').classList.remove('hidden');
+            document.getElementById('user-balance').innerText = data.user.balance;
+            document.getElementById('ref-link').innerText = window.location.origin + "?ref=" + data.user.referralCode;
         }
+    }
 
-        async function adminLogin() {
-            const user = document.getElementById('admin-user').value;
-            const pass = document.getElementById('admin-pass').value;
+    async function unlockTask(amount, hotelName) {
+        alert(`Unlocking ${hotelName}. A prompt of KES ${amount} (40%) will be sent to ${currentUserPhone}`);
+        const res = await fetch('/api/unlock-task', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phoneNumber: currentUserPhone, amount: amount })
+        });
+        const data = await res.json();
+        alert(data.message || data.error);
+    }
 
-            const res = await fetch('/api/admin/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: user, password: pass })
-            });
-            const data = await res.json();
-            if(data.success) {
-                alert("Login successful!");
-                document.getElementById('admin-dashboard').style.display = 'block';
-                fetchDashboard();
-            } else {
-                alert("Access Denied: Wrong credentials.");
-            }
+    function requestWithdrawal() {
+        const amount = parseFloat(document.getElementById('withdraw-amount').value);
+        const name = document.getElementById('withdraw-name').value;
+        const msg = document.getElementById('withdrawal-msg');
+
+        if(!name || !amount) { alert("Please fill in all withdrawal details."); return; }
+
+        if(amount < 5000) {
+            msg.style.color = "red";
+            msg.innerText = "❌ Minimum withdrawal amount is KES 5,000. Keep reviewing hotels and referring friends to reach your threshold!";
+        } else {
+            msg.style.color = "green";
+            msg.innerText = `✅ Withdrawal request of KES ${amount} submitted for ${name}. Processing to M-Pesa...`;
         }
+    }
 
-        async function fetchDashboard() {
-            const res = await fetch('/api/admin/dashboard');
-            const data = await res.json();
-            if(data.success) {
-                document.getElementById('wallet-balance').innerText = data.totalBalance;
-            }
+    async function adminLogin() {
+        const user = document.getElementById('admin-user').value;
+        const pass = document.getElementById('admin-pass').value;
+
+        const res = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, password: pass })
+        });
+        const data = await res.json();
+        if(data.success) {
+            document.getElementById('admin-panel').classList.remove('hidden');
+            const dashRes = await fetch('/api/admin/dashboard');
+            const dashData = await dashRes.json();
+            document.getElementById('admin-total').innerText = dashData.totalBalance;
+            alert("Admin Login Successful!");
+        } else {
+            alert("Access Denied: Wrong credentials.");
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
