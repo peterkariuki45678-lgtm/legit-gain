@@ -11,18 +11,20 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Connect to MongoDB Atlas
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("Database connected successfully"))
-  .catch(err => console.error("Database connection error:", err));
+// MongoDB Connection
+const mongoUri = process.env.MONGO_URI;
+if (mongoUri) {
+  mongoose.connect(mongoUri)
+    .then(() => console.log("Database connected successfully"))
+    .catch(err => console.error("Database connection error:", err));
+}
 
-// Database Schemas
+// Schemas
 const UserSchema = new mongoose.Schema({
-  phone: { type: String, unique: true, required: true },
+  phone: { type: String, required: true, unique: true },
+  passwordHash: { type: String, required: true },
   balance: { type: Number, default: 0 },
   surveyCompleted: { type: Boolean, default: false },
-  unlockedTasks: [Number],
-  referralCode: String,
   referredBy: String,
   createdAt: { type: Date, default: Date.now }
 });
@@ -43,7 +45,7 @@ const AdminSchema = new mongoose.Schema({
 });
 const Admin = mongoose.model("Admin", AdminSchema);
 
-// Daraja Token Generator
+// --- DARAJA TOKEN ---
 async function getDarajaAccessToken() {
   const consumerKey = process.env.DARAJA_CONSUMER_KEY;
   const consumerSecret = process.env.DARAJA_CONSUMER_SECRET;
@@ -57,45 +59,70 @@ async function getDarajaAccessToken() {
   return response.data.access_token;
 }
 
-// --- USER REGISTRATION & SURVEY SUBMISSION ---
-app.post("/api/register-survey", async (req, res) => {
-  const { phone, answers, referralCode } = req.body;
+// --- USER SIGNUP & LOGIN ---
+app.post("/api/signup", async (req, res) => {
+  let { phone, password } = req.body;
+  if (!phone || !password) return res.json({ success: false, message: "Fill all fields" });
+  if (phone.startsWith("0")) phone = "254" + phone.slice(1);
+
   try {
-    let user = await User.findOne({ phone });
-    if (!user) {
-      const generatedRef = "LG-" + Math.floor(1000 + Math.random() * 9000);
-      user = new User({ phone, referralCode: generatedRef });
-      
-      if (referralCode) {
-        const referrer = await User.findOne({ referralCode });
-        if (referrer) {
-          referrer.balance += 500; // Referral bonus
-          await referrer.save();
-          user.referredBy = referralCode;
-        }
-      }
-    }
+    const existing = await User.findOne({ phone });
+    if (existing) return res.json({ success: false, message: "User already exists. Please Sign In." });
 
-    if (!user.surveyCompleted) {
-      // 9 survey questions * 40 KES = 360 KES credited
-      const surveyEarnings = 9 * 40; 
-      user.balance += surveyEarnings;
-      user.surveyCompleted = true;
-    }
-
-    await user.save();
-    res.json({ success: true, message: "Survey completed! Credited to your account.", user });
+    const passwordHash = await bcrypt.hash(password, 10);
+    const newUser = await User.create({ phone, passwordHash, balance: 0 });
+    res.json({ success: true, user: newUser });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, message: "Signup error" });
   }
 });
 
-// --- M-PESA STK PUSH (UNLOCK TASK WITH 40%) ---
+app.post("/api/login", async (req, res) => {
+  let { phone, password } = req.body;
+  if (phone.startsWith("0")) phone = "254" + phone.slice(1);
+
+  try {
+    const user = await User.findOne({ phone });
+    if (!user) return res.json({ success: false, message: "User not found" });
+
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if (!match) return res.json({ success: false, message: "Incorrect password" });
+
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Login error" });
+  }
+});
+
+// --- SURVEY REWARD ROUTE ---
+app.post("/api/survey", async (req, res) => {
+  let { phone, county, education } = req.body;
+  if (phone.startsWith("0")) phone = "254" + phone.slice(1);
+
+  try {
+    const user = await User.findOne({ phone });
+    if (!user || user.surveyCompleted) return res.json({ success: false, message: "Invalid or already completed" });
+
+    // 2 questions answered = 80 KSh (40 KSh per question)
+    user.balance += 80;
+    user.surveyCompleted = true;
+    await user.save();
+
+    res.json({ success: true, balance: user.balance });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Survey error" });
+  }
+});
+
+app.get("/api/user/:phone", async (req, res) => {
+  const user = await User.findOne({ phone: req.params.phone });
+  res.json({ success: true, user });
+});
+
+// --- DARAJA STK PUSH (DYNAMIC AMOUNT) ---
 app.post("/api/unlock-task", async (req, res) => {
   let { phoneNumber, amount } = req.body;
-  if (phoneNumber.startsWith("0")) {
-    phoneNumber = "254" + phoneNumber.slice(1);
-  }
+  if (phoneNumber.startsWith("0")) phoneNumber = "254" + phoneNumber.slice(1);
 
   try {
     const accessToken = await getDarajaAccessToken();
@@ -111,13 +138,13 @@ app.post("/api/unlock-task", async (req, res) => {
         Password: password,
         Timestamp: timestamp,
         TransactionType: "CustomerPayBillOnline",
-        Amount: amount, // Dynamic 40% amount
+        Amount: amount, // Dynamic amount (e.g. 400 KSh)
         PartyA: phoneNumber,
         PartyB: shortCode,
         PhoneNumber: phoneNumber,
-        CallBackURL: "https://mydomain.com/api/mpesa/callback",
+        CallBackURL: "https://legit-gain.onrender.com/api/mpesa/callback",
         AccountReference: "LegitGainUnlock",
-        TransactionDesc: "Unlock Hotel Review Task"
+        TransactionDesc: "Task Unlock Fee"
       },
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
@@ -131,16 +158,39 @@ app.post("/api/unlock-task", async (req, res) => {
 
     res.json({
       success: true,
-      message: `Prompt sent to ${phoneNumber} for KES ${amount}. Enter your M-Pesa PIN.`,
-      checkoutRequestId: stkResponse.data.CheckoutRequestID
+      message: `Prompt sent to your phone for KES ${amount}. Enter your M-Pesa PIN to unlock!`
     });
   } catch (error) {
-    console.error("STK Error:", error.response?.data || error.message);
-    res.status(500).json({ success: false, error: "Failed to initiate M-Pesa prompt" });
+    console.res?.data || error.message;
+    res.status(500).json({ success: false, error: "Failed to trigger M-Pesa prompt" });
   }
 });
 
-// --- ADMIN LOGIN ---
+// --- WITHDRAWAL THRESHOLD CHECK ---
+app.post("/api/withdraw", async (req, res) => {
+  let { phone, name, amount } = req.body;
+  const WITHDRAWAL_LIMIT = 5000;
+
+  try {
+    const user = await User.findOne({ phone });
+    if (!user) return res.json({ success: false, message: "User not found" });
+
+    if (amount < WITHDRAWAL_LIMIT || user.balance < WITHDRAWAL_LIMIT) {
+      return res.json({ 
+        success: false, 
+        message: `Withdrawal failed! Minimum withdrawal limit is KES 5,000. Your current balance is KES ${user.balance}.` 
+      });
+    }
+
+    user.balance -= amount;
+    await user.save();
+    res.json({ success: true, message: `Success! KES ${amount} sent to ${name} (${phone}).` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Withdrawal error" });
+  }
+});
+
+// --- ADMIN LOGIN & DASHBOARD ---
 app.post("/api/admin/login", async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -150,24 +200,20 @@ app.post("/api/admin/login", async (req, res) => {
       admin = await Admin.create({ username: "admin", passwordHash: hash });
     }
 
-    const isMatch = await bcrypt.compare(password, admin.passwordHash);
-    if (!isMatch) return res.status(400).json({ success: false, message: "Invalid credentials" });
+    if (username !== "admin") return res.json({ success: false });
+    const match = await bcrypt.compare(password, admin.passwordHash);
+    if (!match) return res.json({ success: false });
 
-    res.json({ success: true, token: "admin_token_secure" });
+    res.json({ success: true, token: "admin_token" });
   } catch (err) {
-    res.status(500).json({ success: false, error: "Server error" });
+    res.status(500).json({ success: false });
   }
 });
 
-// --- ADMIN DASHBOARD BALANCE ---
 app.get("/api/admin/dashboard", async (req, res) => {
-  try {
-    const txs = await Transaction.find({ status: "Success" });
-    const totalBalance = txs.reduce((sum, t) => sum + t.amount, 0);
-    res.json({ success: true, totalBalance, transactions: txs });
-  } catch (err) {
-    res.status(500).json({ success: false, error: "Failed to load dashboard" });
-  }
+  const successfulTxs = await Transaction.find({ status: "Success" });
+  const totalBalance = successfulTxs.reduce((sum, tx) => sum + tx.amount, 0);
+  res.json({ success: true, totalBalance });
 });
 
 app.get("*", (req, res) => {
