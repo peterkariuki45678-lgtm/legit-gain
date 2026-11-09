@@ -1,243 +1,521 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Legit Gain - Hotel Reviews & Earning Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legit Gain & Hotel Reviews</title>
+
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 0; }
-        .hero { text-align: center; padding: 80px 20px; max-width: 800px; margin: 0 auto; }
-        h1 { font-size: 3rem; margin-bottom: 15px; color: #38bdf8; }
-        p { font-size: 1.1rem; color: #94a3b8; line-height: 1.6; }
-        .btn { background: #22c55e; color: white; padding: 14px 28px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 14px rgba(34,197,94,0.4); width: 100%; box-sizing: border-box; }
-        .btn:hover { background: #16a34a; }
-        .container { background: #1e293b; max-width: 500px; margin: 40px auto; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: left; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 16px; box-sizing: border-box; }
-        .hidden { display: none; }
-        .hotel-card { background: #334155; border: 1px solid #475569; padding: 15px; margin: 15px 0; border-radius: 8px; }
-        .admin-section { margin-top: 60px; background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #475569; max-width: 500px; margin-left: auto; margin-right: auto; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 75px 20px;
+            max-width: 850px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #38bdf8;
+            font-size: 38px;
+        }
+
+        p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .container {
+            background: #1e293b;
+            max-width: 550px;
+            margin: 35px auto;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px;
+            margin: 9px 0 17px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            font-size: 16px;
+        }
+
+        label {
+            color: #e2e8f0;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 7px;
+            background: #22c55e;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #16a34a;
+        }
+
+        .blue {
+            background: #2563eb;
+        }
+
+        .blue:hover {
+            background: #1d4ed8;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .hotel-card {
+            background: #334155;
+            padding: 17px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .message {
+            text-align: center;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .error {
+            color: #f87171;
+        }
+
+        .success {
+            color: #4ade80;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 35px;
+        }
+
+        .stats div {
+            min-width: 120px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #94a3b8;
+        }
     </style>
 </head>
+
 <body>
 
-    <!-- 1. LANDING PAGE VIEW -->
-    <div id="landing-page" class="hero">
-        <h1>Legit Gain & Hotel Reviews</h1>
-        <p>The premier platform connecting users with instant online earning opportunities. Review top-tier Kenyan hotels, complete quick surveys, and get paid instantly via M-Pesa.</p>
-        <button class="btn" style="width: auto;" onclick="showAuth()">⚡ Start Earning Free Today</button>
-        
-        <div style="display: flex; justify-content: space-around; margin-top: 50px; background: #1e293b; padding: 20px; border-radius: 10px;">
-            <div><h3>KES 3.8M+</h3><p style="font-size: 0.9rem;">Total Payouts Sent</p></div>
-            <div><h3>15,000+</h3><p style="font-size: 0.9rem;">Active Earners</p></div>
-            <div><h3>< 30 sec</h3><p style="font-size: 0.9rem;">Instant M-Pesa Speed</p></div>
-        </div>
-    </div>
+    <!-- HOME PAGE -->
+    <section id="landing-page" class="hero">
 
-    <!-- 2. SIGN UP / SIGN IN MODAL -->
-    <div id="auth-modal" class="container hidden">
-        <h2 style="text-align: center; color: #38bdf8;" id="auth-title">Create Your Account</h2>
-        
+        <h1>Legit Gain & Hotel Reviews</h1>
+
+        <p>
+            Welcome to Legit Gain. Explore hotel information,
+            share reviews and discover opportunities.
+        </p>
+
+        <button class="btn" style="max-width:300px;margin:25px auto;"
+                onclick="showAuth()">
+            Create Your Free Account
+        </button>
+
+        <div class="stats">
+            <div>
+                <h2>Hotels</h2>
+                <p>Explore hotel listings</p>
+            </div>
+
+            <div>
+                <h2>Reviews</h2>
+                <p>Share your experience</p>
+            </div>
+
+            <div>
+                <h2>Free</h2>
+                <p>Create an account</p>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- SIGNUP AND LOGIN -->
+    <section id="auth-modal" class="container hidden">
+
+        <h2 id="auth-title" style="text-align:center;color:#38bdf8;">
+            Create Your Account
+        </h2>
+
         <div id="signup-fields">
+
             <label>Full Name</label>
-            <input type="text" id="reg-name" placeholder="John Doe">
-            
-            <label>Kenyan County (Where you live)</label>
+            <input type="text" id="reg-name"
+                   placeholder="Enter your full name"
+                   autocomplete="name">
+
+            <label>County</label>
             <select id="reg-county">
                 <option value="Nairobi">Nairobi</option>
                 <option value="Kiambu">Kiambu</option>
                 <option value="Mombasa">Mombasa</option>
                 <option value="Nakuru">Nakuru</option>
                 <option value="Kisumu">Kisumu</option>
+                <option value="Other">Other</option>
             </select>
+
         </div>
 
-        <label>Safaricom Phone Number</label>
-        <input type="text" id="auth-phone" placeholder="0712345678">
-        
+        <label>Phone Number</label>
+        <input type="tel" id="auth-phone"
+               placeholder="0712345678"
+               autocomplete="tel">
+
         <label>Password</label>
-        <input type="password" id="auth-pass" placeholder="Enter secure password">
-        
-        <button class="btn" id="auth-action-btn" onclick="submitAuth()">Create Account & Claim Bonus</button>
-        <button class="btn" style="background: #3b82f6; margin-top: 10px;" id="toggle-btn" onclick="toggleMode()">Already have an account? Sign In</button>
-        <p id="auth-msg" style="color: #f87171; text-align: center; font-weight: bold;"></p>
-        <p style="text-align: center; cursor: pointer; color: #94a3b8; margin-top: 15px;" onclick="location.reload()">← Back to Home</p>
-    </div>
+        <input type="password" id="auth-pass"
+               placeholder="Enter your password"
+               autocomplete="new-password">
 
-    <!-- 3. USER DASHBOARD -->
-    <div id="dashboard-section" class="container hidden" style="max-width: 700px;">
-        <h2 style="color: #38bdf8;">Your Earning Dashboard</h2>
-        <p><strong>Name:</strong> <span id="dash-name"></span> | <strong>County:</strong> <span id="dash-county"></span></p>
+        <button class="btn" id="auth-action-btn"
+                onclick="submitAuth()">
+            Create Account
+        </button>
+
+        <button class="btn blue" id="toggle-btn"
+                onclick="toggleMode()">
+            Already have an account? Sign In
+        </button>
+
+        <p id="auth-msg" class="message"></p>
+
+        <p style="text-align:center;cursor:pointer;"
+           onclick="goHome()">
+            ← Back to Home
+        </p>
+
+    </section>
+
+
+    <!-- USER DASHBOARD -->
+    <section id="dashboard-section"
+             class="container hidden"
+             style="max-width:700px;">
+
+        <h2 style="color:#38bdf8;">Your Dashboard</h2>
+
+        <p><strong>Name:</strong> <span id="dash-name"></span></p>
+        <p><strong>County:</strong> <span id="dash-county"></span></p>
         <p><strong>Phone:</strong> <span id="dash-phone"></span></p>
-        <p><strong>Account Balance:</strong> KES <span id="dash-balance" style="color: #22c55e; font-size: 1.2rem; font-weight: bold;">0</span></p>
-        
-        <div style="background: #0f172a; padding: 15px; border-radius: 8px; margin: 15px 0;">
-            <h4>Your Referral Link</h4>
-            <input type="text" id="ref-link" readonly style="background: #1e293b; color: #38bdf8;">
-            <p style="font-size: 0.85rem; color: #94a3b8;">Share with friends and get gifted KES 500 when they join!</p>
-        </div>
 
-        <h3>Available Hotel Review Tasks</h3>
+        <hr>
+
+        <h3>Hotel Listings</h3>
+
         <div class="hotel-card">
-            <h4>Sarova Stanley Hotel Review</h4>
-            <p>Reward: <strong>KES 1,000</strong> | Unlock Fee (40%): <strong>KES 400</strong></p>
-            <button class="btn" style="padding: 10px; font-size: 14px;" onclick="unlockTask(400, 'Sarova Stanley')">Unlock Task (Pay KES 400)</button>
+            <h3>Sarova Stanley Hotel</h3>
+            <p>Explore information and share your hotel experience.</p>
+            <a href="https://www.sarovahotels.com/stanley-nairobi/"
+               target="_blank" rel="noopener noreferrer">
+                Visit Hotel Website
+            </a>
         </div>
+
         <div class="hotel-card">
-            <h4>Villa Rosa Kempinski Review</h4>
-            <p>Reward: <strong>KES 1,500</strong> | Unlock Fee (40%): <strong>KES 600</strong></p>
-            <button class="btn" style="padding: 10px; font-size: 14px;" onclick="unlockTask(600, 'Villa Rosa Kempinski')">Unlock Task (Pay KES 600)</button>
+            <h3>Villa Rosa Kempinski</h3>
+            <p>Explore information and share your hotel experience.</p>
+            <a href="https://www.kempinski.com/"
+               target="_blank" rel="noopener noreferrer">
+                Visit Hotel Website
+            </a>
         </div>
 
-        <h3 style="margin-top: 30px;">Withdraw Funds</h3>
-        <input type="text" id="withdraw-name" placeholder="Enter Full Name for Payout">
-        <input type="number" id="withdraw-amount" placeholder="Enter amount (Minimum KES 5,000)">
-        <button class="btn" style="background: #3b82f6;" onclick="requestWithdrawal()">Withdraw to M-Pesa</button>
-        <p id="withdrawal-msg" style="font-weight: bold; margin-top: 10px;"></p>
-    </div>
+        <button class="btn blue" onclick="logout()">
+            Log Out
+        </button>
 
-    <!-- 4. ADMIN SECTION -->
-    <div class="admin-section">
-        <h3 style="color: #f87171;">🔒 Admin Control Center</h3>
-        <input type="text" id="admin-user" placeholder="Admin Username (admin)">
-        <input type="password" id="admin-pass" placeholder="Admin Password">
-        <button class="btn" style="background: #ef4444;" onclick="adminLogin()">Login to Admin Panel</button>
-        
-        <div id="admin-panel" class="hidden" style="margin-top: 15px;">
-            <h4>Admin Wallet Summary</h4>
-            <p><strong>Total Task Unlocks Collected:</strong> KES <span id="admin-total">0</span></p>
-            <button class="btn" style="background: #eab308; color: black;" onclick="alert('Withdrawal push to admin bank/M-Pesa initiated!')">Withdraw Admin Funds</button>
-        </div>
-    </div>
+        <p id="dashboard-msg" class="message"></p>
+
+    </section>
+
+
+    <footer>
+        Legit Gain & Hotel Reviews
+    </footer>
+
 
     <script>
         let currentUser = null;
         let isLoginMode = false;
+        let requestInProgress = false;
 
+
+        // SHOW SIGNUP PAGE
         function showAuth() {
-            document.getElementById('landing-page').classList.add('hidden');
-            document.getElementById('auth-modal').classList.remove('hidden');
+            document.getElementById("landing-page")
+                .classList.add("hidden");
+
+            document.getElementById("dashboard-section")
+                .classList.add("hidden");
+
+            document.getElementById("auth-modal")
+                .classList.remove("hidden");
+
+            document.getElementById("auth-msg").textContent = "";
         }
 
+
+        // RETURN HOME
+        function goHome() {
+            document.getElementById("auth-modal")
+                .classList.add("hidden");
+
+            document.getElementById("dashboard-section")
+                .classList.add("hidden");
+
+            document.getElementById("landing-page")
+                .classList.remove("hidden");
+        }
+
+
+        // SWITCH BETWEEN SIGNUP AND LOGIN
         function toggleMode() {
             isLoginMode = !isLoginMode;
-            if(isLoginMode) {
-                document.getElementById('auth-title').innerText = "Sign In to Your Account";
-                document.getElementById('signup-fields').classList.add('hidden');
-                document.getElementById('auth-action-btn').innerText = "Sign In";
-                document.getElementById('toggle-btn').innerText = "Need an account? Sign Up";
+
+            const title = document.getElementById("auth-title");
+            const fields = document.getElementById("signup-fields");
+            const action = document.getElementById("auth-action-btn");
+            const toggle = document.getElementById("toggle-btn");
+            const password = document.getElementById("auth-pass");
+
+            document.getElementById("auth-msg").textContent = "";
+
+            if (isLoginMode) {
+                title.textContent = "Sign In to Your Account";
+                fields.classList.add("hidden");
+                action.textContent = "Sign In";
+                toggle.textContent = "Need an account? Sign Up";
+                password.autocomplete = "current-password";
             } else {
-                document.getElementById('auth-title').innerText = "Create Your Account";
-                document.getElementById('signup-fields').classList.remove('hidden');
-                document.getElementById('auth-action-btn').innerText = "Create Account & Claim Bonus";
-                document.getElementById('toggle-btn').innerText = "Already have an account? Sign In";
+                title.textContent = "Create Your Account";
+                fields.classList.remove("hidden");
+                action.textContent = "Create Account";
+                toggle.textContent = "Already have an account? Sign In";
+                password.autocomplete = "new-password";
             }
         }
 
-        async function submitAuth() {
-            const phone = document.getElementById('auth-phone').value;
-            const password = document.getElementById('auth-pass').value;
-            const msg = document.getElementById('auth-msg');
 
-            if(!phone || !password) {
-                msg.innerText = "Please fill in all required fields.";
+        // SIGNUP AND LOGIN
+        async function submitAuth() {
+
+            if (requestInProgress) return;
+
+            const phone = document.getElementById("auth-phone")
+                .value.trim();
+
+            const password = document.getElementById("auth-pass")
+                .value;
+
+            const msg = document.getElementById("auth-msg");
+            const button = document.getElementById("auth-action-btn");
+
+            msg.textContent = "";
+            msg.className = "message error";
+
+            if (!phone || !password) {
+                msg.textContent = "Please enter your phone number and password.";
                 return;
             }
 
-            let endpoint = '/api/signup';
-            let payload = { phone, password };
+            if (password.length < 6) {
+                msg.textContent = "Password must contain at least 6 characters.";
+                return;
+            }
 
-            if(!isLoginMode) {
-                const fullName = document.getElementById('reg-name').value;
-                const county = document.getElementById('reg-county').value;
-                if(!fullName) {
-                    msg.innerText = "Please enter your full name.";
+            let endpoint = "/api/signup";
+            let payload = {
+                phone: phone,
+                password: password
+            };
+
+            if (!isLoginMode) {
+
+                const fullName = document.getElementById("reg-name")
+                    .value.trim();
+
+                const county = document.getElementById("reg-county")
+                    .value;
+
+                if (!fullName) {
+                    msg.textContent = "Please enter your full name.";
                     return;
                 }
+
                 payload.fullName = fullName;
                 payload.county = county;
+
             } else {
-                endpoint = '/api/login';
+                endpoint = "/api/login";
             }
+
+            requestInProgress = true;
+            button.disabled = true;
+            button.textContent = "Please wait...";
 
             try {
-                const res = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+
+                const response = await fetch(endpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
                     body: JSON.stringify(payload)
                 });
-                const data = await res.json();
-                
-                if(data.success) {
-                    currentUser = data.user;
-                    document.getElementById('auth-modal').classList.add('hidden');
-                    loadDashboard();
-                } else {
-                    msg.innerText = data.message;
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(
+                        data.message || data.error ||
+                        "Unable to complete your request."
+                    );
                 }
-            } catch(err) {
-                msg.innerText = "Connection error. Please try again.";
+
+                if (!data.user || !data.user.phone) {
+                    throw new Error("The server returned incomplete account information.");
+                }
+
+                currentUser = data.user;
+
+                msg.className = "message success";
+                msg.textContent = "Account successful! Loading dashboard...";
+
+                await loadDashboard();
+
+            } catch (error) {
+
+                msg.className = "message error";
+                msg.textContent = error.message ||
+                    "Connection error. Please try again.";
+
+            } finally {
+
+                requestInProgress = false;
+                button.disabled = false;
+                button.textContent = isLoginMode
+                    ? "Sign In"
+                    : "Create Account";
             }
         }
 
+
+        // LOAD USER DASHBOARD
         async function loadDashboard() {
-            document.getElementById('dashboard-section').classList.remove('hidden');
-            const res = await fetch(`/api/user/${currentUser.phone}`);
-            const data = await res.json();
-            if(data.success) {
-                document.getElementById('dash-name').innerText = data.user.fullName;
-                document.getElementById('dash-county').innerText = data.user.county;
-                document.getElementById('dash-phone').innerText = data.user.phone;
-                document.getElementById('dash-balance').innerText = data.user.balance;
-                document.getElementById('ref-link').value = window.location.origin + "?ref=" + data.user.phone;
+
+            try {
+
+                const phone = encodeURIComponent(currentUser.phone);
+
+                const response = await fetch(
+                    "/api/user/" + phone
+                );
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(
+                        data.message || "Could not load your account."
+                    );
+                }
+
+                const user = data.user;
+
+                document.getElementById("dash-name").textContent =
+                    user.fullName || "";
+
+                document.getElementById("dash-county").textContent =
+                    user.county || "";
+
+                document.getElementById("dash-phone").textContent =
+                    user.phone || "";
+
+                document.getElementById("auth-modal")
+                    .classList.add("hidden");
+
+                document.getElementById("landing-page")
+                    .classList.add("hidden");
+
+                document.getElementById("dashboard-section")
+                    .classList.remove("hidden");
+
+            } catch (error) {
+
+                document.getElementById("auth-msg").textContent =
+                    "Your account was accepted, but the dashboard could not load: " +
+                    error.message;
+
             }
         }
 
-        async function unlockTask(amount, hotelName) {
-            alert(`Unlocking ${hotelName}. M-Pesa prompt of KES ${amount} will be sent to ${currentUser.phone}`);
-            const res = await fetch('/api/unlock-task', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phoneNumber: currentUser.phone, amount: amount })
+
+        // LOGOUT
+        function logout() {
+            currentUser = null;
+            isLoginMode = false;
+
+            document.getElementById("auth-phone").value = "";
+            document.getElementById("auth-pass").value = "";
+
+            document.getElementById("dashboard-section")
+                .classList.add("hidden");
+
+            document.getElementById("auth-modal")
+                .classList.add("hidden");
+
+            document.getElementById("landing-page")
+                .classList.remove("hidden");
+        }
+
+
+        // ALLOW ENTER KEY TO SUBMIT
+        document.getElementById("auth-pass")
+            .addEventListener("keydown", function(event) {
+                if (event.key === "Enter") {
+                    submitAuth();
+                }
             });
-            const data = await res.json();
-            alert(data.message || data.error);
-        }
 
-        function requestWithdrawal() {
-            const amount = parseFloat(document.getElementById('withdraw-amount').value);
-            const name = document.getElementById('withdraw-name').value;
-            const msg = document.getElementById('withdrawal-msg');
-
-            if(!name || !amount) { alert("Please fill in all withdrawal details."); return; }
-
-            if(amount < 5000) {
-                msg.style.color = "#f87171";
-                msg.innerText = "❌ Minimum withdrawal limit is KES 5,000. Keep reviewing hotels to reach your threshold!";
-            } else {
-                msg.style.color = "#22c55e";
-                msg.innerText = `✅ Withdrawal request of KES ${amount} submitted for ${name}. Processing to M-Pesa...`;
-            }
-        }
-
-        async function adminLogin() {
-            const username = document.getElementById('admin-user').value;
-            const password = document.getElementById('admin-pass').value;
-            
-            const res = await fetch('/api/admin/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await res.json();
-            if(data.success) {
-                document.getElementById('admin-panel').classList.remove('hidden');
-                const dashRes = await fetch('/api/admin/dashboard');
-                const dashData = await dashRes.json();
-                document.getElementById('admin-total').innerText = dashData.totalBalance;
-                alert("Admin Login Successful!");
-            } else {
-                alert("Access Denied: Wrong credentials.");
-            }
-        }
     </script>
+
 </body>
 </html>
