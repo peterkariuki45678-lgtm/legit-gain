@@ -4,16 +4,24 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const axios = require("axios");
+const path = require("path");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use(express.static("public"));
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/task_portal")
-  .then(() => console.log("Database connected successfully"))
-  .catch(err => console.error("Database connection error:", err));
+// Serve static frontend files from the "public" folder
+app.use(express.static(path.join(__dirname, "public")));
+
+// Connect to Cloud MongoDB Database
+const mongoUri = process.env.MONGO_URI;
+if (mongoUri) {
+  mongoose.connect(mongoUri)
+    .then(() => console.log("Database connected successfully"))
+    .catch(err => console.error("Database connection error:", err));
+} else {
+  console.log("Warning: MONGO_URI environment variable is missing!");
+}
 
 const TransactionSchema = new mongoose.Schema({
   phoneNumber: String,
@@ -74,7 +82,7 @@ app.post("/api/unlock-task", async (req, res) => {
         PartyA: phoneNumber,
         PartyB: shortCode,
         PhoneNumber: phoneNumber,
-        CallBackURL: "https://mydomain.com/api/mpesa/callback", // Replace with your live deployed URL later
+        CallBackURL: "https://legit-gain.onrender.com/api/mpesa/callback",
         AccountReference: "TaskUnlock",
         TransactionDesc: "Unlock Task Fee"
       },
@@ -105,7 +113,6 @@ app.post("/api/admin/login", async (req, res) => {
   try {
     let admin = await Admin.findOne({ username });
     if (!admin) {
-      // Auto-create default admin on first try if none exists
       const hash = await bcrypt.hash("AdminSecret2026!", 10);
       admin = await Admin.create({ username: "admin", passwordHash: hash });
     }
@@ -128,6 +135,11 @@ app.get("/api/admin/dashboard", async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, error: "Error fetching balance" });
   }
+});
+
+// Fallback to serve index.html for root path
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 const PORT = process.env.PORT || 3000;
