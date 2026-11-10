@@ -2,520 +2,400 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legit Gain & Hotel Reviews</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: white;
-            margin: 0;
-            padding: 0;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 75px 20px;
-            max-width: 850px;
-            margin: auto;
-        }
-
-        h1 {
-            color: #38bdf8;
-            font-size: 38px;
-        }
-
-        p {
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
-
-        .container {
-            background: #1e293b;
-            max-width: 550px;
-            margin: 35px auto;
-            padding: 25px;
-            border-radius: 12px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 13px;
-            margin: 9px 0 17px;
-            border-radius: 6px;
-            border: 1px solid #475569;
-            background: #0f172a;
-            color: white;
-            font-size: 16px;
-        }
-
-        label {
-            color: #e2e8f0;
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            margin-top: 12px;
-            border: none;
-            border-radius: 7px;
-            background: #22c55e;
-            color: white;
-            font-size: 17px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background: #16a34a;
-        }
-
-        .blue {
-            background: #2563eb;
-        }
-
-        .blue:hover {
-            background: #1d4ed8;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .hotel-card {
-            background: #334155;
-            padding: 17px;
-            margin: 15px 0;
-            border-radius: 8px;
-        }
-
-        .message {
-            text-align: center;
-            font-weight: bold;
-            overflow-wrap: anywhere;
-        }
-
-        .error {
-            color: #f87171;
-        }
-
-        .success {
-            color: #4ade80;
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 15px;
-            background: #1e293b;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 35px;
-        }
-
-        .stats div {
-            min-width: 120px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 30px;
-            color: #94a3b8;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legit Gain | Hotel Research</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#182235}
+header{background:#102b50;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+header h2{margin:0}
+main{max-width:1100px;margin:25px auto;padding:0 15px}
+.card{background:white;border-radius:12px;padding:20px;margin:15px 0;box-shadow:0 3px 14px #0000000c}
+h2,h3{margin-top:0}
+input,select,textarea{width:100%;padding:12px;margin:7px 0 13px;border:1px solid #ccd4df;border-radius:7px;font-size:15px}
+textarea{min-height:110px}
+button{border:0;border-radius:7px;padding:12px 17px;background:#087b54;color:white;font-weight:bold;cursor:pointer;margin:4px 3px 4px 0}
+button.secondary{background:#24517d}
+button.danger{background:#b83232}
+button:disabled{opacity:.6;cursor:not-allowed}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:15px 0}
+.tab{background:#24517d}
+.hidden{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.hotel{border:1px solid #e0e6ee;border-radius:9px;padding:15px}
+.muted{color:#65748a;font-size:14px}
+.notice{padding:12px;background:#eaf4ff;border-radius:8px;margin:10px 0}
+.error{color:#b83232}
+.success{color:#087b54}
+.stat{font-size:25px;font-weight:bold;color:#087b54}
+.small{font-size:13px}
+hr{border:0;border-top:1px solid #e6eaf0;margin:16px 0}
+</style>
 </head>
-
 <body>
-
-    <!-- HOME PAGE -->
-    <section id="landing-page" class="hero">
-
-        <h1>Legit Gain & Hotel Reviews</h1>
-
-        <p>
-            Welcome to Legit Gain. Explore hotel information,
-            share reviews and discover opportunities.
-        </p>
-
-        <button class="btn" style="max-width:300px;margin:25px auto;"
-                onclick="showAuth()">
-            Create Your Free Account
-        </button>
-
-        <div class="stats">
-            <div>
-                <h2>Hotels</h2>
-                <p>Explore hotel listings</p>
-            </div>
-
-            <div>
-                <h2>Reviews</h2>
-                <p>Share your experience</p>
-            </div>
-
-            <div>
-                <h2>Free</h2>
-                <p>Create an account</p>
-            </div>
-        </div>
-
-    </section>
-
-
-    <!-- SIGNUP AND LOGIN -->
-    <section id="auth-modal" class="container hidden">
-
-        <h2 id="auth-title" style="text-align:center;color:#38bdf8;">
-            Create Your Account
-        </h2>
-
-        <div id="signup-fields">
-
-            <label>Full Name</label>
-            <input type="text" id="reg-name"
-                   placeholder="Enter your full name"
-                   autocomplete="name">
-
-            <label>County</label>
-            <select id="reg-county">
-                <option value="Nairobi">Nairobi</option>
-                <option value="Kiambu">Kiambu</option>
-                <option value="Mombasa">Mombasa</option>
-                <option value="Nakuru">Nakuru</option>
-                <option value="Kisumu">Kisumu</option>
-                <option value="Other">Other</option>
-            </select>
-
-        </div>
-
-        <label>Phone Number</label>
-        <input type="tel" id="auth-phone"
-               placeholder="0712345678"
-               autocomplete="tel">
-
-        <label>Password</label>
-        <input type="password" id="auth-pass"
-               placeholder="Enter your password"
-               autocomplete="new-password">
-
-        <button class="btn" id="auth-action-btn"
-                onclick="submitAuth()">
-            Create Account
-        </button>
-
-        <button class="btn blue" id="toggle-btn"
-                onclick="toggleMode()">
-            Already have an account? Sign In
-        </button>
-
-        <p id="auth-msg" class="message"></p>
-
-        <p style="text-align:center;cursor:pointer;"
-           onclick="goHome()">
-            ← Back to Home
-        </p>
-
-    </section>
-
-
-    <!-- USER DASHBOARD -->
-    <section id="dashboard-section"
-             class="container hidden"
-             style="max-width:700px;">
-
-        <h2 style="color:#38bdf8;">Your Dashboard</h2>
-
-        <p><strong>Name:</strong> <span id="dash-name"></span></p>
-        <p><strong>County:</strong> <span id="dash-county"></span></p>
-        <p><strong>Phone:</strong> <span id="dash-phone"></span></p>
-
-        <hr>
-
-        <h3>Hotel Listings</h3>
-
-        <div class="hotel-card">
-            <h3>Sarova Stanley Hotel</h3>
-            <p>Explore information and share your hotel experience.</p>
-            <a href="https://www.sarovahotels.com/stanley-nairobi/"
-               target="_blank" rel="noopener noreferrer">
-                Visit Hotel Website
-            </a>
-        </div>
-
-        <div class="hotel-card">
-            <h3>Villa Rosa Kempinski</h3>
-            <p>Explore information and share your hotel experience.</p>
-            <a href="https://www.kempinski.com/"
-               target="_blank" rel="noopener noreferrer">
-                Visit Hotel Website
-            </a>
-        </div>
-
-        <button class="btn blue" onclick="logout()">
-            Log Out
-        </button>
-
-        <p id="dashboard-msg" class="message"></p>
-
-    </section>
-
-
-    <footer>
-        Legit Gain & Hotel Reviews
-    </footer>
-
-
-    <script>
-        let currentUser = null;
-        let isLoginMode = false;
-        let requestInProgress = false;
-
-
-        // SHOW SIGNUP PAGE
-        function showAuth() {
-            document.getElementById("landing-page")
-                .classList.add("hidden");
-
-            document.getElementById("dashboard-section")
-                .classList.add("hidden");
-
-            document.getElementById("auth-modal")
-                .classList.remove("hidden");
-
-            document.getElementById("auth-msg").textContent = "";
-        }
-
-
-        // RETURN HOME
-        function goHome() {
-            document.getElementById("auth-modal")
-                .classList.add("hidden");
-
-            document.getElementById("dashboard-section")
-                .classList.add("hidden");
-
-            document.getElementById("landing-page")
-                .classList.remove("hidden");
-        }
-
-
-        // SWITCH BETWEEN SIGNUP AND LOGIN
-        function toggleMode() {
-            isLoginMode = !isLoginMode;
-
-            const title = document.getElementById("auth-title");
-            const fields = document.getElementById("signup-fields");
-            const action = document.getElementById("auth-action-btn");
-            const toggle = document.getElementById("toggle-btn");
-            const password = document.getElementById("auth-pass");
-
-            document.getElementById("auth-msg").textContent = "";
-
-            if (isLoginMode) {
-                title.textContent = "Sign In to Your Account";
-                fields.classList.add("hidden");
-                action.textContent = "Sign In";
-                toggle.textContent = "Need an account? Sign Up";
-                password.autocomplete = "current-password";
-            } else {
-                title.textContent = "Create Your Account";
-                fields.classList.remove("hidden");
-                action.textContent = "Create Account";
-                toggle.textContent = "Already have an account? Sign In";
-                password.autocomplete = "new-password";
-            }
-        }
-
-
-        // SIGNUP AND LOGIN
-        async function submitAuth() {
-
-            if (requestInProgress) return;
-
-            const phone = document.getElementById("auth-phone")
-                .value.trim();
-
-            const password = document.getElementById("auth-pass")
-                .value;
-
-            const msg = document.getElementById("auth-msg");
-            const button = document.getElementById("auth-action-btn");
-
-            msg.textContent = "";
-            msg.className = "message error";
-
-            if (!phone || !password) {
-                msg.textContent = "Please enter your phone number and password.";
-                return;
-            }
-
-            if (password.length < 6) {
-                msg.textContent = "Password must contain at least 6 characters.";
-                return;
-            }
-
-            let endpoint = "/api/signup";
-            let payload = {
-                phone: phone,
-                password: password
-            };
-
-            if (!isLoginMode) {
-
-                const fullName = document.getElementById("reg-name")
-                    .value.trim();
-
-                const county = document.getElementById("reg-county")
-                    .value;
-
-                if (!fullName) {
-                    msg.textContent = "Please enter your full name.";
-                    return;
-                }
-
-                payload.fullName = fullName;
-                payload.county = county;
-
-            } else {
-                endpoint = "/api/login";
-            }
-
-            requestInProgress = true;
-            button.disabled = true;
-            button.textContent = "Please wait...";
-
-            try {
-
-                const response = await fetch(endpoint, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await response.json();
-
-                if (!response.ok || !data.success) {
-                    throw new Error(
-                        data.message || data.error ||
-                        "Unable to complete your request."
-                    );
-                }
-
-                if (!data.user || !data.user.phone) {
-                    throw new Error("The server returned incomplete account information.");
-                }
-
-                currentUser = data.user;
-
-                msg.className = "message success";
-                msg.textContent = "Account successful! Loading dashboard...";
-
-                await loadDashboard();
-
-            } catch (error) {
-
-                msg.className = "message error";
-                msg.textContent = error.message ||
-                    "Connection error. Please try again.";
-
-            } finally {
-
-                requestInProgress = false;
-                button.disabled = false;
-                button.textContent = isLoginMode
-                    ? "Sign In"
-                    : "Create Account";
-            }
-        }
-
-
-        // LOAD USER DASHBOARD
-        async function loadDashboard() {
-
-            try {
-
-                const phone = encodeURIComponent(currentUser.phone);
-
-                const response = await fetch(
-                    "/api/user/" + phone
-                );
-
-                const data = await response.json();
-
-                if (!response.ok || !data.success) {
-                    throw new Error(
-                        data.message || "Could not load your account."
-                    );
-                }
-
-                const user = data.user;
-
-                document.getElementById("dash-name").textContent =
-                    user.fullName || "";
-
-                document.getElementById("dash-county").textContent =
-                    user.county || "";
-
-                document.getElementById("dash-phone").textContent =
-                    user.phone || "";
-
-                document.getElementById("auth-modal")
-                    .classList.add("hidden");
-
-                document.getElementById("landing-page")
-                    .classList.add("hidden");
-
-                document.getElementById("dashboard-section")
-                    .classList.remove("hidden");
-
-            } catch (error) {
-
-                document.getElementById("auth-msg").textContent =
-                    "Your account was accepted, but the dashboard could not load: " +
-                    error.message;
-
-            }
-        }
-
-
-        // LOGOUT
-        function logout() {
-            currentUser = null;
-            isLoginMode = false;
-
-            document.getElementById("auth-phone").value = "";
-            document.getElementById("auth-pass").value = "";
-
-            document.getElementById("dashboard-section")
-                .classList.add("hidden");
-
-            document.getElementById("auth-modal")
-                .classList.add("hidden");
-
-            document.getElementById("landing-page")
-                .classList.remove("hidden");
-        }
-
-
-        // ALLOW ENTER KEY TO SUBMIT
-        document.getElementById("auth-pass")
-            .addEventListener("keydown", function(event) {
-                if (event.key === "Enter") {
-                    submitAuth();
-                }
-            });
-
-    </script>
-
+<header>
+  <h2>LEGIT GAIN</h2>
+  <div id="headerRight">Hotel Research Platform</div>
+</header>
+
+<main>
+<section id="authSection">
+  <div class="card">
+    <h2>Create your account</h2>
+    <p class="muted">Register to access hotel research tasks.</p>
+    <form id="signupForm">
+      <label>Full name</label>
+      <input id="signupName" required placeholder="Your full name">
+      <label>County</label>
+      <select id="signupCounty" required>
+        <option value="">Select your county</option>
+        <option>Nairobi</option><option>Mombasa</option><option>Kisumu</option>
+        <option>Nakuru</option><option>Kiambu</option><option>Uasin Gishu</option>
+        <option>Machakos</option><option>Nyeri</option><option>Kakamega</option>
+        <option>Meru</option><option>Garissa</option><option>Other</option>
+      </select>
+      <label>Phone number</label>
+      <input id="signupPhone" required placeholder="07XXXXXXXX">
+      <label>Password</label>
+      <input id="signupPassword" type="password" required minlength="6" placeholder="At least 6 characters">
+      <label>Referral code (optional)</label>
+      <input id="signupReferral" placeholder="Enter referral code">
+      <button type="submit">Create account</button>
+    </form>
+    <p id="signupMessage"></p>
+  </div>
+
+  <div class="card">
+    <h2>Already registered? Sign in</h2>
+    <form id="loginForm">
+      <label>Phone number</label>
+      <input id="loginPhone" required placeholder="07XXXXXXXX">
+      <label>Password</label>
+      <input id="loginPassword" type="password" required>
+      <button type="submit">Sign in</button>
+    </form>
+    <p id="loginMessage"></p>
+  </div>
+
+  <div class="card">
+    <h3>Administrator</h3>
+    <p class="muted">For authorised platform administrators only.</p>
+    <form id="adminLoginForm">
+      <input id="adminUsername" required placeholder="Admin username">
+      <input id="adminPassword" type="password" required placeholder="Admin password">
+      <button class="secondary" type="submit">Admin sign in</button>
+    </form>
+    <p id="adminLoginMessage"></p>
+  </div>
+</section>
+
+<section id="dashboard" class="hidden">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <div>
+        <h2 id="welcomeName">Welcome</h2>
+        <p class="muted" id="profileDetails"></p>
+      </div>
+      <button class="danger" onclick="logout()">Log out</button>
+    </div>
+    <div class="grid">
+      <div class="notice"><div class="muted">Wallet balance</div><div class="stat">KSh 0</div><div class="small">Test mode</div></div>
+      <div class="notice"><div class="muted">Referral code</div><strong id="myReferral">—</strong><br><button class="secondary" onclick="copyReferral()">Copy code</button></div>
+      <div class="notice"><div class="muted">Task submissions</div><div class="stat" id="submissionCount">0</div></div>
+    </div>
+    <p class="small muted">This is currently a test platform. No cash earnings, payment collection, or withdrawals are enabled. Task submissions are for research and review.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" onclick="showPanel('tasksPanel')">Hotel tasks</button>
+    <button class="tab" onclick="showPanel('historyPanel')">My submissions</button>
+    <button class="tab" onclick="showPanel('surveyPanel')">Survey</button>
+  </div>
+
+  <div id="tasksPanel" class="card">
+    <h2>Available hotel research tasks</h2>
+    <p class="muted">Research a hotel and submit factual information. Do not claim to have visited a hotel if you have not.</p>
+    <div id="tasksList">Loading tasks...</div>
+  </div>
+
+  <div id="historyPanel" class="card hidden">
+    <h2>My task submissions</h2>
+    <div id="historyList">Loading...</div>
+  </div>
+
+  <div id="surveyPanel" class="card hidden">
+    <h2>Welcome survey</h2>
+    <p class="muted">Answer all 10 questions. Your answers help us understand your research interests.</p>
+    <form id="surveyForm">
+      <div id="surveyQuestions"></div>
+      <button type="submit">Submit survey</button>
+    </form>
+    <p id="surveyMessage"></p>
+  </div>
+</section>
+
+<section id="adminSection" class="hidden">
+  <div class="card">
+    <h2>Administrator dashboard</h2>
+    <button class="danger" onclick="adminLogout()">Admin log out</button>
+    <div id="adminStats" class="notice">Loading overview...</div>
+  </div>
+  <div class="card">
+    <h2>Review task submissions</h2>
+    <div id="adminSubmissions">Loading submissions...</div>
+  </div>
+</section>
+</main>
+
+<script>
+const API = "";
+let userToken = localStorage.getItem("lg_user_token") || "";
+let currentUser = null;
+let adminToken = "";
+
+function el(id){return document.getElementById(id)}
+function message(id,text,type="error"){
+  el(id).textContent=text;
+  el(id).className=type;
+}
+function escapeHtml(value){
+  return String(value ?? "").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+async function request(path,options={}){
+  const headers={"Content-Type":"application/json",...(options.headers||{})};
+  if(userToken) headers.Authorization="Bearer "+userToken;
+  const response=await fetch(API+path,{...options,headers});
+  const data=await response.json().catch(()=>({message:"Invalid server response"}));
+  if(!response.ok) throw new Error(data.message||"Request failed");
+  return data;
+}
+function showAuth(){
+  el("authSection").classList.remove("hidden");
+  el("dashboard").classList.add("hidden");
+  el("adminSection").classList.add("hidden");
+  el("headerRight").textContent="Hotel Research Platform";
+}
+function showDashboard(){
+  el("authSection").classList.add("hidden");
+  el("dashboard").classList.remove("hidden");
+  el("adminSection").classList.add("hidden");
+  el("headerRight").textContent="Member dashboard";
+}
+function showPanel(id){
+  ["tasksPanel","historyPanel","surveyPanel"].forEach(x=>el(x).classList.add("hidden"));
+  el(id).classList.remove("hidden");
+}
+function logout(){
+  userToken="";
+  currentUser=null;
+  localStorage.removeItem("lg_user_token");
+  showAuth();
+}
+function adminLogout(){
+  adminToken="";
+  el("adminSection").classList.add("hidden");
+  showAuth();
+}
+function copyReferral(){
+  const code=el("myReferral").textContent;
+  if(code && code!=="—") navigator.clipboard.writeText(code).then(()=>alert("Referral code copied")).catch(()=>alert("Copy failed"));
+}
+
+el("signupForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  message("signupMessage","Creating account...","muted");
+  try{
+    const data=await request("/api/signup",{method:"POST",body:JSON.stringify({
+      fullName:el("signupName").value.trim(),
+      county:el("signupCounty").value,
+      phone:el("signupPhone").value.trim(),
+      password:el("signupPassword").value,
+      referralCode:el("signupReferral").value.trim()
+    })});
+    userToken=data.token;
+    localStorage.setItem("lg_user_token",userToken);
+    await loadDashboard();
+  }catch(err){message("signupMessage",err.message)}
+});
+
+el("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  message("loginMessage","Signing in...","muted");
+  try{
+    const data=await request("/api/login",{method:"POST",body:JSON.stringify({
+      phone:el("loginPhone").value.trim(),
+      password:el("loginPassword").value
+    })});
+    userToken=data.token;
+    localStorage.setItem("lg_user_token",userToken);
+    await loadDashboard();
+  }catch(err){message("loginMessage",err.message)}
+});
+
+async function loadDashboard(){
+  try{
+    const data=await request("/api/me");
+    currentUser=data.user;
+    showDashboard();
+    el("welcomeName").textContent="Welcome, "+(currentUser.fullName||"Member");
+    el("profileDetails").textContent=(currentUser.phone||"")+" • "+(currentUser.county||"");
+    el("myReferral").textContent=currentUser.referralCode||"Not assigned";
+    el("submissionCount").textContent=(data.submissions||[]).length;
+    renderHistory(data.submissions||[]);
+    await loadTasks();
+  }catch(err){
+    logout();
+    alert("Please sign in again: "+err.message);
+  }
+}
+
+async function loadTasks(){
+  const box=el("tasksList");
+  box.textContent="Loading tasks...";
+  try{
+    const data=await request("/api/tasks");
+    const tasks=data.tasks||[];
+    if(!tasks.length){box.textContent="No tasks are available yet.";return}
+    box.innerHTML='<div class="grid">'+tasks.map(task=>`
+      <div class="hotel">
+        <h3>${escapeHtml(task.name)}</h3>
+        <p class="muted">Hotel research task</p>
+        <button onclick="submitTask('${escapeHtml(task.id)}','${escapeHtml(task.name).replace(/'/g,"&#39;")}')">Submit research</button>
+      </div>`).join("")+'</div>';
+  }catch(err){box.textContent=err.message}
+}
+
+async function submitTask(id,name){
+  const notes=prompt("Write your factual research about "+name+". Include useful details and at least 30 characters:");
+  if(notes===null)return;
+  if(notes.trim().length<30){alert("Please enter at least 30 characters.");return}
+  try{
+    const data=await request("/api/tasks/"+encodeURIComponent(id)+"/submit",{
+      method:"POST",body:JSON.stringify({notes:notes.trim()})
+    });
+    alert(data.message||"Submission received for review.");
+    await loadDashboard();
+    showPanel("historyPanel");
+  }catch(err){alert(err.message)}
+}
+
+function renderHistory(items){
+  const box=el("historyList");
+  if(!items.length){box.textContent="You have not submitted any tasks yet.";return}
+  box.innerHTML=items.map(item=>`
+    <div class="hotel">
+      <strong>${escapeHtml(item.taskName||"Research task")}</strong>
+      <p>${escapeHtml(item.notes||"")}</p>
+      <p class="muted">Status: ${escapeHtml(item.status||"Pending review")}</p>
+      <p class="small muted">${item.createdAt?new Date(item.createdAt).toLocaleString():""}</p>
+    </div>`).join("");
+}
+
+const questions=[
+ "Which county do you live in?",
+ "What type of hotel interests you most?",
+ "Do you prefer budget, mid-range, or luxury hotels?",
+ "Which part of Kenya would you like to research?",
+ "What information about hotels is most useful to travellers?",
+ "Do you usually research hotels online?",
+ "Which facilities matter most to hotel guests?",
+ "Would you like to research restaurants too?",
+ "How much time can you spend on research tasks?",
+ "What would make this research platform more useful?"
+];
+el("surveyQuestions").innerHTML=questions.map((q,i)=>`
+  <label>${i+1}. ${escapeHtml(q)}</label>
+  <input name="answer" required maxlength="500" placeholder="Your answer">
+`).join("");
+
+el("surveyForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const answers=[...el("surveyForm").querySelectorAll('input[name="answer"]')].map(x=>x.value.trim());
+  try{
+    const data=await request("/api/survey",{method:"POST",body:JSON.stringify({answers})});
+    message("surveyMessage",data.message||"Survey submitted successfully.","success");
+  }catch(err){message("surveyMessage",err.message)}
+});
+
+el("adminLoginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  message("adminLoginMessage","Signing in...","muted");
+  try{
+    const response=await fetch(API+"/api/admin/login",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        username:el("adminUsername").value.trim(),
+        password:el("adminPassword").value
+      })
+    });
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.message||"Admin login failed");
+    adminToken=data.token;
+    el("authSection").classList.add("hidden");
+    el("dashboard").classList.add("hidden");
+    el("adminSection").classList.remove("hidden");
+    el("headerRight").textContent="Administrator";
+    await loadAdmin();
+  }catch(err){message("adminLoginMessage",err.message)}
+});
+
+async function adminRequest(path,options={}){
+  const response=await fetch(API+path,{
+    ...options,
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:"Bearer "+adminToken,
+      ...(options.headers||{})
+    }
+  });
+  const data=await response.json().catch(()=>({message:"Invalid response"}));
+  if(!response.ok)throw new Error(data.message||"Admin request failed");
+  return data;
+}
+
+async function loadAdmin(){
+  try{
+    const overview=await adminRequest("/api/admin/overview");
+    el("adminStats").innerHTML=`
+      <h3>Platform overview</h3>
+      <p>Registered users: <strong>${escapeHtml(overview.totalUsers??0)}</strong></p>
+      <p>Task submissions: <strong>${escapeHtml(overview.totalSubmissions??0)}</strong></p>
+      <p>Pending reviews: <strong>${escapeHtml(overview.pendingSubmissions??0)}</strong></p>`;
+    const result=await adminRequest("/api/admin/submissions");
+    const items=result.submissions||[];
+    if(!items.length){el("adminSubmissions").textContent="No submissions yet.";return}
+    el("adminSubmissions").innerHTML=items.map(item=>`
+      <div class="hotel">
+        <h3>${escapeHtml(item.taskName)}</h3>
+        <p><strong>User:</strong> ${escapeHtml(item.userId?.fullName||"Unknown")}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(item.userId?.phone||"")}</p>
+        <p>${escapeHtml(item.notes)}</p>
+        <p><strong>Status:</strong> ${escapeHtml(item.status)}</p>
+        <button onclick="reviewSubmission('${escapeHtml(item._id)}','Approved')">Approve</button>
+        <button class="danger" onclick="reviewSubmission('${escapeHtml(item._id)}','Rejected')">Reject</button>
+      </div>`).join("");
+  }catch(err){
+    el("adminStats").textContent=err.message;
+    el("adminSubmissions").textContent="Could not load submissions.";
+  }
+}
+
+async function reviewSubmission(id,status){
+  if(!confirm("Mark this submission as "+status+"?"))return;
+  try{
+    await adminRequest("/api/admin/submissions/"+encodeURIComponent(id),{
+      method:"PATCH",body:JSON.stringify({status})
+    });
+    alert("Submission updated.");
+    await loadAdmin();
+  }catch(err){alert(err.message)}
+}
+
+if(userToken)loadDashboard();
+else showAuth();
+</script>
 </body>
 </html>
