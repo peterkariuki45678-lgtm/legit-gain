@@ -3,701 +3,610 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Legit Gain | Hotel Research</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Legit Gain</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#182235}
-header{background:#102b50;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+body{margin:0;background:#f3f6fb;color:#182235;font-family:Arial,sans-serif}
+header{background:#102b50;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 header h2{margin:0}
-main{max-width:1100px;margin:25px auto;padding:0 15px}
+main{max-width:1150px;margin:25px auto;padding:0 15px}
 .card{background:white;border-radius:12px;padding:20px;margin:15px 0;box-shadow:0 3px 14px #0000000c}
-h2,h3{margin-top:0}
 input,select,textarea{width:100%;padding:12px;margin:7px 0 13px;border:1px solid #ccd4df;border-radius:7px;font-size:15px}
 textarea{min-height:110px}
 button{border:0;border-radius:7px;padding:12px 17px;background:#087b54;color:white;font-weight:bold;cursor:pointer;margin:4px 3px 4px 0}
 button.secondary{background:#24517d}
 button.danger{background:#b83232}
 button:disabled{opacity:.6;cursor:not-allowed}
+.hidden{display:none!important}
 .tabs{display:flex;gap:7px;flex-wrap:wrap;margin:15px 0}
 .tab{background:#24517d}
-.hidden{display:none!important}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
-.hotel{border:1px solid #e0e6ee;border-radius:9px;padding:15px;margin:10px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.hotel{border:1px solid #e0e6ee;border-radius:9px;padding:15px;margin:10px 0;overflow-wrap:anywhere}
 .muted{color:#65748a;font-size:14px}
 .notice{padding:14px;background:#eaf4ff;border-radius:8px;margin:10px 0}
 .rules{background:#fff8e8;border:1px solid #f0d89e;padding:16px;border-radius:9px;margin:14px 0}
-.error{color:#b83232}
-.success{color:#087b54}
 .stat{font-size:25px;font-weight:bold;color:#087b54}
 .small{font-size:13px}
+.error{color:#b83232}
+.success{color:#087b54}
 hr{border:0;border-top:1px solid #e6eaf0;margin:16px 0}
 .checkline{display:flex;align-items:flex-start;gap:10px;margin:15px 0}
 .checkline input{width:auto;margin:3px 0}
-a{color:#1764a5}
+.click-card{cursor:pointer;text-align:left;color:inherit;width:100%;display:block;background:#eaf4ff;border:2px solid transparent;padding:16px;border-radius:10px;margin:0}
+.click-card:hover{border-color:#087b54}
+.click-card .stat{display:block;margin:7px 0}
+.back{background:#24517d;margin-bottom:15px}
+.code{font-size:22px;font-weight:bold;letter-spacing:2px;overflow-wrap:anywhere}
+.linkbox{background:#f1f5f9;border-radius:8px;padding:12px;overflow-wrap:anywhere;margin:12px 0}
 </style>
 </head>
 <body>
 <header>
-  <h2>LEGIT GAIN</h2>
-  <div id="headerRight">Hotel Research Platform</div>
+<h2>LEGIT GAIN</h2>
+<div id="headerRight">Hotel Research Platform</div>
 </header>
-
 <main>
+
 <section id="authSection">
-  <div class="card">
-    <h2>Create your account</h2>
-    <p class="muted">Register to access hotel research tasks.</p>
-    <form id="signupForm">
-      <label>Full name</label>
-      <input id="signupName" required placeholder="Your full name">
-      <label>County</label>
-      <select id="signupCounty" required>
-        <option value="">Select your county</option>
-        <option>Nairobi</option><option>Mombasa</option><option>Kisumu</option>
-        <option>Nakuru</option><option>Kiambu</option><option>Uasin Gishu</option>
-        <option>Machakos</option><option>Nyeri</option><option>Kakamega</option>
-        <option>Meru</option><option>Garissa</option><option>Other</option>
-      </select>
-      <label>Phone number</label>
-      <input id="signupPhone" required placeholder="07XXXXXXXX">
-      <label>Password</label>
-      <input id="signupPassword" type="password" required minlength="6" placeholder="At least 6 characters">
-      <label>Referral code (optional)</label>
-      <input id="signupReferral" placeholder="Enter referral code">
-      <button type="submit" id="signupButton">Create account</button>
-    </form>
-    <p id="signupMessage"></p>
-  </div>
+<div class="card">
+<h2>Create your account</h2>
+<p class="muted">Register to access hotel research tasks.</p>
+<form id="signupForm">
+<label>Full name</label>
+<input id="signupName" required placeholder="Your full name">
+<label>County</label>
+<select id="signupCounty" required>
+<option value="">Select your county</option>
+<option>Nairobi</option><option>Mombasa</option><option>Kisumu</option>
+<option>Nakuru</option><option>Kiambu</option><option>Uasin Gishu</option>
+<option>Machakos</option><option>Nyeri</option><option>Kakamega</option>
+<option>Meru</option><option>Garissa</option><option>Other</option>
+</select>
+<label>Phone number</label>
+<input id="signupPhone" required placeholder="07XXXXXXXX">
+<label>Password</label>
+<input id="signupPassword" type="password" required minlength="6">
+<label>Referral code (optional)</label>
+<input id="signupReferral" placeholder="Enter referral code">
+<button type="submit" id="signupButton">Create account</button>
+</form>
+<p id="signupMessage"></p>
+</div>
 
-  <div class="card">
-    <h2>Already registered? Sign in</h2>
-    <form id="loginForm">
-      <label>Phone number</label>
-      <input id="loginPhone" required placeholder="07XXXXXXXX">
-      <label>Password</label>
-      <input id="loginPassword" type="password" required>
-      <button type="submit" id="loginButton">Sign in</button>
-    </form>
-    <p id="loginMessage"></p>
-  </div>
+<div class="card">
+<h2>Already registered? Sign in</h2>
+<form id="loginForm">
+<label>Phone number</label>
+<input id="loginPhone" required placeholder="07XXXXXXXX">
+<label>Password</label>
+<input id="loginPassword" type="password" required>
+<button type="submit" id="loginButton">Sign in</button>
+</form>
+<p id="loginMessage"></p>
+</div>
 
-  <div class="card">
-    <h3>Administrator</h3>
-    <p class="muted">For authorised platform administrators only.</p>
-    <form id="adminLoginForm">
-      <input id="adminUsername" required placeholder="Admin username">
-      <input id="adminPassword" type="password" required placeholder="Admin password">
-      <button class="secondary" type="submit">Admin sign in</button>
-    </form>
-    <p id="adminLoginMessage"></p>
-  </div>
+<div class="card">
+<h3>Administrator</h3>
+<p class="muted">For authorised platform administrators only.</p>
+<form id="adminLoginForm">
+<label>Admin username</label>
+<input id="adminUsername" required>
+<label>Admin password</label>
+<input id="adminPassword" type="password" required>
+<button class="secondary" type="submit">Admin sign in</button>
+</form>
+<p id="adminLoginMessage"></p>
+</div>
 </section>
 
 <section id="dashboard" class="hidden">
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
-      <div>
-        <h2 id="welcomeName">Welcome</h2>
-        <p class="muted" id="profileDetails"></p>
-      </div>
-      <button class="danger" onclick="logout()">Log out</button>
-    </div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+<div><h2 id="welcomeName">Welcome</h2><p class="muted" id="profileDetails"></p></div>
+<button class="danger" onclick="logout()">Log out</button>
+</div>
+<div class="grid">
+<button class="click-card" onclick="openWallet()">
+<span class="muted">Wallet balance · Open wallet</span>
+<span class="stat">KSh 0</span>
+<span class="small">View wallet details and transactions</span>
+</button>
+<button class="click-card" onclick="openReferrals()">
+<span class="muted">My referral code · Open referrals</span>
+<span class="stat" id="myReferral">Loading...</span>
+<span class="small">View invited members and share your link</span>
+</button>
+<div class="notice">
+<div class="muted">Task submissions</div>
+<div class="stat" id="submissionCount">0</div>
+</div>
+</div>
+<p class="small muted">Wallet payments and withdrawals are not yet connected. No cash earnings are being credited at this stage.</p>
+</div>
 
-    <div class="grid">
-      <div class="notice">
-        <div class="muted">Wallet balance</div>
-        <div class="stat">KSh 0</div>
-        <div class="small">Test mode</div>
-      </div>
-      <div class="notice">
-        <div class="muted">Referral code</div>
-        <strong id="myReferral">—</strong><br>
-        <button class="secondary" onclick="copyReferral()">Copy code</button>
-      </div>
-      <div class="notice">
-        <div class="muted">Task submissions</div>
-        <div class="stat" id="submissionCount">0</div>
-      </div>
-    </div>
-    <p class="small muted">This is currently a test platform. No cash earnings, payment collection, or withdrawals are enabled. Task submissions are for research and review.</p>
-  </div>
+<div class="tabs">
+<button class="tab" onclick="showPanel('tasksPanel')">Hotel tasks</button>
+<button class="tab" onclick="showPanel('historyPanel')">My submissions</button>
+<button class="tab" onclick="showPanel('surveyPanel')">Survey</button>
+</div>
 
-  <div class="tabs">
-    <button class="tab" onclick="showPanel('tasksPanel')">Hotel tasks</button>
-    <button class="tab" onclick="showPanel('historyPanel')">My submissions</button>
-    <button class="tab" onclick="showPanel('surveyPanel')">Survey</button>
-  </div>
+<div id="tasksPanel" class="card">
+<h2>Available hotel research tasks</h2>
+<p class="muted">Submit accurate information. Do not claim to have visited a hotel if you have not.</p>
+<div id="taskRulesPanel" class="rules hidden">
+<h3>Research rules</h3>
+<ul>
+<li>Submit accurate and honest information.</li>
+<li>Do not copy another researcher's submission.</li>
+<li>Do not claim hotel visits that did not happen.</li>
+<li>Submissions may be reviewed by an administrator.</li>
+<li>Accepting these rules does not require payment.</li>
+</ul>
+<label class="checkline">
+<input type="checkbox" id="acceptRulesCheckbox">
+<span>I have read and agree to follow the research rules.</span>
+</label>
+<button id="unlockTasksButton" onclick="unlockTasks()">Accept rules and unlock tasks</button>
+<p id="unlockMessage"></p>
+</div>
+<div id="tasksList">Loading tasks...</div>
+</div>
 
-  <div id="tasksPanel" class="card">
-    <h2>Available hotel research tasks</h2>
-    <p class="muted">Research hotels and submit accurate information. Do not claim to have visited a hotel if you have not.</p>
+<div id="historyPanel" class="card hidden">
+<h2>My task submissions</h2>
+<div id="historyList">Loading...</div>
+</div>
 
-    <div id="taskRulesPanel" class="rules hidden">
-      <h3>Before accessing research tasks</h3>
-      <p>Please read and accept these research rules:</p>
-      <ul>
-        <li>Submit accurate and honest information.</li>
-        <li>Do not copy another researcher's submission.</li>
-        <li>Do not claim personal hotel visits that did not happen.</li>
-        <li>Submissions may be reviewed by the platform administrator.</li>
-        <li>Accepting these rules does not require a payment.</li>
-      </ul>
-      <label class="checkline">
-        <input type="checkbox" id="acceptRulesCheckbox">
-        <span>I have read and agree to follow the research rules.</span>
-      </label>
-      <button id="unlockTasksButton" onclick="unlockTasks()">Accept rules and unlock tasks</button>
-      <p id="unlockMessage"></p>
-    </div>
+<div id="surveyPanel" class="card hidden">
+<h2>Welcome survey</h2>
+<p class="muted">Answer all 10 questions.</p>
+<form id="surveyForm">
+<div id="surveyQuestions"></div>
+<button type="submit">Submit survey</button>
+</form>
+<p id="surveyMessage"></p>
+</div>
+</section>
 
-    <div id="tasksList">Loading tasks...</div>
-  </div>
+<section id="referralsPage" class="hidden">
+<div class="card">
+<button class="back" onclick="backToDashboard()">← Back to Dashboard</button>
+<h2>My Referrals</h2>
+<p class="muted">Invite people to join Legit Gain using your personal referral link.</p>
+<div class="notice">
+<div class="muted">Your unique referral code</div>
+<div class="code" id="referralPageCode">Loading...</div>
+<button onclick="copyReferralCode()">Copy referral code</button>
+</div>
+<h3>Your referral link</h3>
+<div class="linkbox" id="referralLink">Loading...</div>
+<button onclick="copyReferralLink()">Copy referral link</button>
+<button class="secondary" onclick="shareReferralLink()">Share invitation</button>
+<div class="notice">
+<div class="muted">People registered using your code</div>
+<div class="stat" id="referralTotal">0</div>
+</div>
+<h3>People you invited</h3>
+<div id="referralMembers">Loading referrals...</div>
+</div>
+</section>
 
-  <div id="historyPanel" class="card hidden">
-    <h2>My task submissions</h2>
-    <div id="historyList">Loading...</div>
-  </div>
-
-  <div id="surveyPanel" class="card hidden">
-    <h2>Welcome survey</h2>
-    <p class="muted">Answer all 10 questions. Your answers help us understand your research interests.</p>
-    <form id="surveyForm">
-      <div id="surveyQuestions"></div>
-      <button type="submit">Submit survey</button>
-    </form>
-    <p id="surveyMessage"></p>
-  </div>
+<section id="walletPage" class="hidden">
+<div class="card">
+<button class="back" onclick="backToDashboard()">← Back to Dashboard</button>
+<h2>My Wallet</h2>
+<div class="notice">
+<div class="muted">Available balance</div>
+<div class="stat" id="walletBalance">KSh 0</div>
+<p class="small" id="walletStatus">Payments are not connected.</p>
+</div>
+<h3>Wallet transactions</h3>
+<div id="walletTransactions">No transactions yet.</div>
+<div class="rules">
+<strong>Wallet setup pending</strong>
+<p class="small">Deposits, reward payments and withdrawals will appear here after a payment provider and payout process have been properly configured and tested.</p>
+</div>
+</div>
 </section>
 
 <section id="adminSection" class="hidden">
-  <div class="card">
-    <h2>Administrator dashboard</h2>
-    <button class="danger" onclick="adminLogout()">Admin log out</button>
-    <div id="adminStats" class="notice">Loading overview...</div>
-  </div>
-  <div class="card">
-    <h2>Review task submissions</h2>
-    <div id="adminSubmissions">Loading submissions...</div>
-  </div>
+<div class="card">
+<h2>Administrator dashboard</h2>
+<button class="danger" onclick="adminLogout()">Admin log out</button>
+<div id="adminStats" class="notice">Loading overview...</div>
+</div>
+<div class="card">
+<h2>Review task submissions</h2>
+<div id="adminSubmissions">Loading submissions...</div>
+</div>
 </section>
 </main>
 
 <script>
-const API = "";
-let userToken = localStorage.getItem("lg_user_token") || "";
-let currentUser = null;
-let adminToken = "";
+const API="";
+let userToken=localStorage.getItem("lg_user_token")||"";
+let currentUser=null;
+let adminToken="";
+let currentReferralLink="";
 
-function el(id){
-  return document.getElementById(id);
-}
+const $=id=>document.getElementById(id);
 
 function message(id,text,type="error"){
-  el(id).textContent=text;
-  el(id).className=type;
+$(id).textContent=text;
+$(id).className=type;
 }
 
 function escapeHtml(value){
-  return String(value ?? "").replace(/[&<>"']/g,c=>({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[c]));
+return String(value??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
 }
 
 async function request(path,options={}){
-  const headers={
-    "Content-Type":"application/json",
-    ...(options.headers||{})
-  };
+const headers={"Content-Type":"application/json",...(options.headers||{})};
+if(userToken)headers.Authorization="Bearer "+userToken;
+const response=await fetch(API+path,{...options,headers});
+const data=await response.json().catch(()=>({message:"Invalid server response"}));
+if(!response.ok)throw new Error(data.message||"Request failed");
+return data;
+}
 
-  if(userToken){
-    headers.Authorization="Bearer "+userToken;
-  }
-
-  const response=await fetch(API+path,{...options,headers});
-  const data=await response.json().catch(()=>({
-    message:"Invalid server response"
-  }));
-
-  if(!response.ok){
-    throw new Error(data.message||data.error||"Request failed");
-  }
-
-  return data;
+function showOnly(id){
+["authSection","dashboard","referralsPage","walletPage","adminSection"]
+.forEach(section=>$(section).classList.add("hidden"));
+$(id).classList.remove("hidden");
 }
 
 function showAuth(){
-  el("authSection").classList.remove("hidden");
-  el("dashboard").classList.add("hidden");
-  el("adminSection").classList.add("hidden");
-  el("headerRight").textContent="Hotel Research Platform";
+showOnly("authSection");
+$("headerRight").textContent="Hotel Research Platform";
 }
 
 function showDashboard(){
-  el("authSection").classList.add("hidden");
-  el("dashboard").classList.remove("hidden");
-  el("adminSection").classList.add("hidden");
-  el("headerRight").textContent="Member dashboard";
+showOnly("dashboard");
+$("headerRight").textContent="Member dashboard";
 }
 
 function showPanel(id){
-  ["tasksPanel","historyPanel","surveyPanel"].forEach(x=>{
-    el(x).classList.add("hidden");
-  });
-  el(id).classList.remove("hidden");
+["tasksPanel","historyPanel","surveyPanel"].forEach(x=>$(x).classList.add("hidden"));
+$(id).classList.remove("hidden");
 }
 
+function backToDashboard(){showDashboard();}
+
 function logout(){
-  userToken="";
-  currentUser=null;
-  localStorage.removeItem("lg_user_token");
-  showAuth();
+userToken="";
+currentUser=null;
+localStorage.removeItem("lg_user_token");
+showAuth();
 }
 
 function adminLogout(){
-  adminToken="";
-  el("adminSection").classList.add("hidden");
-  showAuth();
+adminToken="";
+showAuth();
 }
 
-function copyReferral(){
-  const code=el("myReferral").textContent;
-
-  if(code && code!=="—"){
-    navigator.clipboard.writeText(code)
-      .then(()=>alert("Referral code copied"))
-      .catch(()=>alert("Copy failed"));
-  }
+function copyText(value){
+if(navigator.clipboard&&window.isSecureContext){
+navigator.clipboard.writeText(value).then(()=>alert("Copied successfully.")).catch(()=>fallbackCopy(value));
+}else fallbackCopy(value);
 }
 
-/* SIGN UP */
-el("signupForm").addEventListener("submit",async e=>{
-  e.preventDefault();
+function fallbackCopy(value){
+const area=document.createElement("textarea");
+area.value=value;
+document.body.appendChild(area);
+area.select();
+try{document.execCommand("copy");alert("Copied successfully.");}
+catch{alert("Copy failed. Please copy the text manually.");}
+area.remove();
+}
 
-  const button=el("signupButton");
-  button.disabled=true;
-  button.textContent="Creating account...";
-  message("signupMessage","Please wait...","muted");
+function copyReferralCode(){copyText($("referralPageCode").textContent);}
+function copyReferralLink(){if(currentReferralLink)copyText(currentReferralLink);}
 
-  try{
-    const data=await request("/api/signup",{
-      method:"POST",
-      body:JSON.stringify({
-        fullName:el("signupName").value.trim(),
-        county:el("signupCounty").value,
-        phone:el("signupPhone").value.trim(),
-        password:el("signupPassword").value,
-        referralCode:el("signupReferral").value.trim()
-      })
-    });
+async function shareReferralLink(){
+if(!currentReferralLink)return;
+if(navigator.share){
+try{
+await navigator.share({title:"Join Legit Gain",text:"Join Legit Gain using my referral link:",url:currentReferralLink});
+}catch(error){if(error.name!=="AbortError")copyReferralLink();}
+}else copyReferralLink();
+}
 
-    if(!data.token){
-      throw new Error("Account created but no login token was returned. Please sign in.");
-    }
+const queryReferral=new URLSearchParams(location.search).get("ref");
+if(queryReferral)$("signupReferral").value=queryReferral.toUpperCase();
 
-    userToken=data.token;
-    localStorage.setItem("lg_user_token",userToken);
-
-    await loadDashboard();
-  }catch(err){
-    message("signupMessage",err.message);
-  }finally{
-    button.disabled=false;
-    button.textContent="Create account";
-  }
+$("signupForm").addEventListener("submit",async e=>{
+e.preventDefault();
+const button=$("signupButton");
+button.disabled=true;
+button.textContent="Creating account...";
+message("signupMessage","Please wait...","muted");
+try{
+const data=await request("/api/signup",{
+method:"POST",
+body:JSON.stringify({
+fullName:$("signupName").value.trim(),
+county:$("signupCounty").value,
+phone:$("signupPhone").value.trim(),
+password:$("signupPassword").value,
+referralCode:$("signupReferral").value.trim()
+})
+});
+if(!data.token)throw new Error("No login token returned. Please sign in.");
+userToken=data.token;
+localStorage.setItem("lg_user_token",userToken);
+await loadDashboard();
+}catch(err){message("signupMessage",err.message);}
+finally{button.disabled=false;button.textContent="Create account";}
 });
 
-/* SIGN IN */
-el("loginForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-
-  const button=el("loginButton");
-  button.disabled=true;
-  button.textContent="Signing in...";
-  message("loginMessage","Please wait...","muted");
-
-  try{
-    const data=await request("/api/login",{
-      method:"POST",
-      body:JSON.stringify({
-        phone:el("loginPhone").value.trim(),
-        password:el("loginPassword").value
-      })
-    });
-
-    if(!data.token){
-      throw new Error("The server did not return a login token.");
-    }
-
-    userToken=data.token;
-    localStorage.setItem("lg_user_token",userToken);
-
-    await loadDashboard();
-  }catch(err){
-    message("loginMessage",err.message);
-  }finally{
-    button.disabled=false;
-    button.textContent="Sign in";
-  }
+$("loginForm").addEventListener("submit",async e=>{
+e.preventDefault();
+const button=$("loginButton");
+button.disabled=true;
+button.textContent="Signing in...";
+message("loginMessage","Please wait...","muted");
+try{
+const data=await request("/api/login",{
+method:"POST",
+body:JSON.stringify({phone:$("loginPhone").value.trim(),password:$("loginPassword").value})
+});
+if(!data.token)throw new Error("No login token returned.");
+userToken=data.token;
+localStorage.setItem("lg_user_token",userToken);
+await loadDashboard();
+}catch(err){message("loginMessage",err.message);}
+finally{button.disabled=false;button.textContent="Sign in";}
 });
 
-/* LOAD MEMBER DASHBOARD */
 async function loadDashboard(){
-  try{
-    const data=await request("/api/me");
-
-    currentUser=data.user;
-
-    if(!currentUser){
-      throw new Error("User information was not returned.");
-    }
-
-    showDashboard();
-
-    el("welcomeName").textContent=
-      "Welcome, "+(currentUser.fullName||"Member");
-
-    el("profileDetails").textContent=
-      (currentUser.phone||"")+" • "+(currentUser.county||"");
-
-    el("myReferral").textContent=
-      currentUser.referralCode||"Not assigned";
-
-    el("submissionCount").textContent=
-      (data.submissions||[]).length;
-
-    renderHistory(data.submissions||[]);
-
-    await loadTasks();
-  }catch(err){
-    logout();
-    alert("Please sign in again: "+err.message);
-  }
+try{
+const data=await request("/api/me");
+currentUser=data.user;
+if(!currentUser)throw new Error("User information not returned.");
+showDashboard();
+$("welcomeName").textContent="Welcome, "+(currentUser.fullName||"Member");
+$("profileDetails").textContent=(currentUser.phone||"")+" • "+(currentUser.county||"");
+$("myReferral").textContent=currentUser.referralCode||"Not assigned";
+$("submissionCount").textContent=(data.submissions||[]).length;
+renderHistory(data.submissions||[]);
+await loadTasks();
+}catch(err){
+logout();
+alert("Please sign in again: "+err.message);
+}
 }
 
-/* TASK RULE ACCEPTANCE */
+async function openReferrals(){
+showOnly("referralsPage");
+$("headerRight").textContent="My referrals";
+$("referralPageCode").textContent="Loading...";
+$("referralLink").textContent="Loading...";
+$("referralMembers").textContent="Loading referrals...";
+try{
+const data=await request("/api/referrals");
+currentReferralLink=data.referralLink||"";
+$("referralPageCode").textContent=data.referralCode||"Not assigned";
+$("referralLink").textContent=currentReferralLink||"Link unavailable";
+$("referralTotal").textContent=data.totalReferrals||0;
+const members=data.referrals||[];
+if(!members.length){
+$("referralMembers").innerHTML='<p class="muted">No one has registered using your referral code yet. Share your link to invite people.</p>';
+return;
+}
+$("referralMembers").innerHTML=members.map(person=>`
+<div class="hotel">
+<strong>${escapeHtml(person.fullName)}</strong>
+<p class="muted">${escapeHtml(person.county||"County not provided")}</p>
+<p class="small muted">Joined: ${person.joinedAt?new Date(person.joinedAt).toLocaleDateString():""}</p>
+</div>`).join("");
+}catch(err){$("referralMembers").textContent=err.message;}
+}
+
+async function openWallet(){
+showOnly("walletPage");
+$("headerRight").textContent="My wallet";
+$("walletStatus").textContent="Loading wallet...";
+$("walletTransactions").textContent="Loading...";
+try{
+const data=await request("/api/wallet");
+$("walletBalance").textContent="KSh "+Number(data.balance||0).toLocaleString("en-KE");
+$("walletStatus").textContent=data.message||"Payment setup is pending.";
+const transactions=data.transactions||[];
+$("walletTransactions").innerHTML=transactions.length
+?transactions.map(tx=>`
+<div class="hotel">
+<strong>${escapeHtml(tx.description||"Transaction")}</strong>
+<p>KSh ${escapeHtml(tx.amount||0)}</p>
+<p class="muted">${escapeHtml(tx.status||"Pending")}</p>
+</div>`).join("")
+:'<p class="muted">No transactions recorded yet.</p>';
+}catch(err){
+$("walletStatus").textContent=err.message;
+$("walletTransactions").textContent="Could not load transactions.";
+}
+}
+
 async function unlockTasks(){
-  const checkbox=el("acceptRulesCheckbox");
-  const button=el("unlockTasksButton");
-
-  if(!checkbox.checked){
-    message("unlockMessage","Please tick the box to confirm that you accept the research rules.");
-    return;
-  }
-
-  button.disabled=true;
-  button.textContent="Please wait...";
-  message("unlockMessage","Saving your acceptance...","muted");
-
-  try{
-    await request("/api/tasks/unlock",{
-      method:"POST",
-      body:JSON.stringify({acceptRules:true})
-    });
-
-    if(currentUser){
-      currentUser.acceptedTaskRules=true;
-    }
-
-    message("unlockMessage","Rules accepted. Loading tasks...","success");
-    await loadTasks();
-  }catch(err){
-    message("unlockMessage",err.message);
-  }finally{
-    button.disabled=false;
-    button.textContent="Accept rules and unlock tasks";
-  }
+if(!$("acceptRulesCheckbox").checked){
+message("unlockMessage","Please tick the box to accept the research rules.");
+return;
+}
+const button=$("unlockTasksButton");
+button.disabled=true;
+button.textContent="Please wait...";
+try{
+await request("/api/tasks/unlock",{method:"POST",body:JSON.stringify({acceptRules:true})});
+if(currentUser)currentUser.acceptedTaskRules=true;
+message("unlockMessage","Rules accepted. Loading tasks...","success");
+await loadTasks();
+}catch(err){message("unlockMessage",err.message);}
+finally{button.disabled=false;button.textContent="Accept rules and unlock tasks";}
 }
 
-/* LOAD HOTEL TASKS */
 async function loadTasks(){
-  const box=el("tasksList");
-  const rulesPanel=el("taskRulesPanel");
-
-  box.textContent="Loading tasks...";
-
-  try{
-    const data=await request("/api/tasks");
-    const tasks=data.tasks||[];
-
-    const unlocked=
-      data.unlocked===true ||
-      (currentUser && currentUser.acceptedTaskRules===true);
-
-    if(!unlocked){
-      rulesPanel.classList.remove("hidden");
-      box.innerHTML=
-        '<div class="notice">Hotel research tasks are locked until you accept the research rules above.</div>';
-      return;
-    }
-
-    rulesPanel.classList.add("hidden");
-
-    if(!tasks.length){
-      box.textContent="No tasks are available yet.";
-      return;
-    }
-
-    box.innerHTML='<div class="grid">'+tasks.map(task=>`
-      <div class="hotel">
-        <h3>${escapeHtml(task.name)}</h3>
-        <p class="muted">Hotel research task</p>
-        <button onclick="submitTask('${escapeHtml(task.id)}','${escapeHtml(task.name).replace(/'/g,"&#39;")}')">
-          Submit research
-        </button>
-      </div>
-    `).join("")+'</div>';
-
-  }catch(err){
-    box.textContent=err.message;
-  }
+const box=$("tasksList");
+box.textContent="Loading tasks...";
+try{
+const data=await request("/api/tasks");
+const tasks=data.tasks||[];
+if(data.unlocked!==true){
+$("taskRulesPanel").classList.remove("hidden");
+box.innerHTML='<div class="notice">Accept the research rules above to unlock hotel tasks.</div>';
+return;
+}
+$("taskRulesPanel").classList.add("hidden");
+if(!tasks.length){box.textContent="No tasks are available yet.";return;}
+box.innerHTML='<div class="grid">'+tasks.map((task,index)=>`
+<div class="hotel">
+<h3>${escapeHtml(task.name)}</h3>
+<p class="muted">Hotel research task</p>
+<button data-task-index="${index}" class="submit-task-button">Submit research</button>
+</div>`).join("")+'</div>';
+box.querySelectorAll(".submit-task-button").forEach(button=>{
+button.addEventListener("click",()=>{
+const task=tasks[Number(button.dataset.taskIndex)];
+submitTask(task.id,task.name);
+});
+});
+}catch(err){box.textContent=err.message;}
 }
 
-/* SUBMIT RESEARCH */
 async function submitTask(id,name){
-  const notes=prompt(
-    "Write your factual research about "+name+
-    ". Include useful details and at least 30 characters:"
-  );
-
-  if(notes===null)return;
-
-  if(notes.trim().length<30){
-    alert("Please enter at least 30 characters.");
-    return;
-  }
-
-  try{
-    const data=await request(
-      "/api/tasks/"+encodeURIComponent(id)+"/submit",
-      {
-        method:"POST",
-        body:JSON.stringify({notes:notes.trim()})
-      }
-    );
-
-    alert(data.message||"Submission received for review.");
-
-    await loadDashboard();
-    showPanel("historyPanel");
-
-  }catch(err){
-    alert(err.message);
-  }
+const notes=prompt("Write your factual research about "+name+". Include useful details and at least 30 characters:");
+if(notes===null)return;
+if(notes.trim().length<30){alert("Please enter at least 30 characters.");return;}
+try{
+const data=await request("/api/tasks/"+encodeURIComponent(id)+"/submit",{
+method:"POST",body:JSON.stringify({notes:notes.trim()})
+});
+alert(data.message||"Research submitted for review.");
+await loadDashboard();
+showPanel("historyPanel");
+}catch(err){alert(err.message);}
 }
 
-/* SUBMISSION HISTORY */
 function renderHistory(items){
-  const box=el("historyList");
-
-  if(!items.length){
-    box.textContent="You have not submitted any tasks yet.";
-    return;
-  }
-
-  box.innerHTML=items.map(item=>`
-    <div class="hotel">
-      <strong>${escapeHtml(item.taskName||"Research task")}</strong>
-      <p>${escapeHtml(item.notes||"")}</p>
-      <p class="muted">
-        Status: ${escapeHtml(item.status||"Pending review")}
-      </p>
-      <p class="small muted">
-        ${item.createdAt?new Date(item.createdAt).toLocaleString():""}
-      </p>
-    </div>
-  `).join("");
+const box=$("historyList");
+if(!items.length){box.textContent="You have not submitted any tasks yet.";return;}
+box.innerHTML=items.map(item=>`
+<div class="hotel">
+<strong>${escapeHtml(item.taskName||"Research task")}</strong>
+<p>${escapeHtml(item.notes||"")}</p>
+<p class="muted">Status: ${escapeHtml(item.status||"Pending review")}</p>
+<p class="small muted">${item.createdAt?new Date(item.createdAt).toLocaleString():""}</p>
+</div>`).join("");
 }
 
-/* WELCOME SURVEY */
 const questions=[
-  "Which county do you live in?",
-  "What type of hotel interests you most?",
-  "Do you prefer budget, mid-range, or luxury hotels?",
-  "Which part of Kenya would you like to research?",
-  "What information about hotels is most useful to travellers?",
-  "Do you usually research hotels online?",
-  "Which facilities matter most to hotel guests?",
-  "Would you like to research restaurants too?",
-  "How much time can you spend on research tasks?",
-  "What would make this research platform more useful?"
+"Which county do you live in?",
+"What type of hotel interests you most?",
+"Do you prefer budget, mid-range, or luxury hotels?",
+"Which part of Kenya would you like to research?",
+"What information about hotels is most useful to travellers?",
+"Do you usually research hotels online?",
+"Which facilities matter most to hotel guests?",
+"Would you like to research restaurants too?",
+"How much time can you spend on research tasks?",
+"What would make this research platform more useful?"
 ];
 
-el("surveyQuestions").innerHTML=questions.map((q,i)=>`
-  <label>${i+1}. ${escapeHtml(q)}</label>
-  <input name="answer" required maxlength="500" placeholder="Your answer">
-`).join("");
+$("surveyQuestions").innerHTML=questions.map((q,i)=>`
+<label>${i+1}. ${escapeHtml(q)}</label>
+<input name="answer" required maxlength="500" placeholder="Your answer">`).join("");
 
-el("surveyForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-
-  const answers=[
-    ...el("surveyForm").querySelectorAll('input[name="answer"]')
-  ].map(x=>x.value.trim());
-
-  try{
-    const data=await request("/api/survey",{
-      method:"POST",
-      body:JSON.stringify({answers})
-    });
-
-    message(
-      "surveyMessage",
-      data.message||"Survey submitted successfully.",
-      "success"
-    );
-  }catch(err){
-    message("surveyMessage",err.message);
-  }
+$("surveyForm").addEventListener("submit",async e=>{
+e.preventDefault();
+const answers=[...$("surveyForm").querySelectorAll('input[name="answer"]')].map(input=>input.value.trim());
+try{
+const data=await request("/api/survey",{method:"POST",body:JSON.stringify({answers})});
+message("surveyMessage",data.message||"Survey submitted.","success");
+}catch(err){message("surveyMessage",err.message);}
 });
 
-/* ADMIN LOGIN */
-el("adminLoginForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-
-  message("adminLoginMessage","Signing in...","muted");
-
-  try{
-    const response=await fetch(API+"/api/admin/login",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        username:el("adminUsername").value.trim(),
-        password:el("adminPassword").value
-      })
-    });
-
-    const data=await response.json();
-
-    if(!response.ok){
-      throw new Error(data.message||"Admin login failed");
-    }
-
-    adminToken=data.token;
-
-    if(!adminToken){
-      throw new Error("Admin login did not return a token.");
-    }
-
-    el("authSection").classList.add("hidden");
-    el("dashboard").classList.add("hidden");
-    el("adminSection").classList.remove("hidden");
-    el("headerRight").textContent="Administrator";
-
-    await loadAdmin();
-
-  }catch(err){
-    message("adminLoginMessage",err.message);
-  }
+$("adminLoginForm").addEventListener("submit",async e=>{
+e.preventDefault();
+message("adminLoginMessage","Signing in...","muted");
+try{
+const response=await fetch(API+"/api/admin/login",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({username:$("adminUsername").value.trim(),password:$("adminPassword").value})
+});
+const data=await response.json();
+if(!response.ok)throw new Error(data.message||"Admin login failed");
+if(!data.token)throw new Error("Admin token was not returned.");
+adminToken=data.token;
+showOnly("adminSection");
+$("headerRight").textContent="Administrator";
+await loadAdmin();
+}catch(err){message("adminLoginMessage",err.message);}
 });
 
-/* ADMIN REQUESTS */
 async function adminRequest(path,options={}){
-  const response=await fetch(API+path,{
-    ...options,
-    headers:{
-      "Content-Type":"application/json",
-      Authorization:"Bearer "+adminToken,
-      ...(options.headers||{})
-    }
-  });
-
-  const data=await response.json().catch(()=>({
-    message:"Invalid response"
-  }));
-
-  if(!response.ok){
-    throw new Error(data.message||"Admin request failed");
-  }
-
-  return data;
+const response=await fetch(API+path,{
+...options,
+headers:{
+"Content-Type":"application/json",
+Authorization:"Bearer "+adminToken,
+...(options.headers||{})
+}
+});
+const data=await response.json().catch(()=>({message:"Invalid response"}));
+if(!response.ok)throw new Error(data.message||"Admin request failed");
+return data;
 }
 
-/* ADMIN DASHBOARD */
 async function loadAdmin(){
-  try{
-    const overview=await adminRequest("/api/admin/overview");
-
-    el("adminStats").innerHTML=`
-      <h3>Platform overview</h3>
-      <p>Registered users:
-        <strong>${escapeHtml(overview.totalUsers??overview.users??0)}</strong>
-      </p>
-      <p>Task submissions:
-        <strong>${escapeHtml(overview.totalSubmissions??overview.submissions??0)}</strong>
-      </p>
-      <p>Pending reviews:
-        <strong>${escapeHtml(overview.pendingSubmissions??overview.pending??0)}</strong>
-      </p>
-    `;
-
-    const result=await adminRequest("/api/admin/submissions");
-    const items=result.submissions||[];
-
-    if(!items.length){
-      el("adminSubmissions").textContent="No submissions yet.";
-      return;
-    }
-
-    el("adminSubmissions").innerHTML=items.map(item=>`
-      <div class="hotel">
-        <h3>${escapeHtml(item.taskName)}</h3>
-        <p><strong>User:</strong>
-          ${escapeHtml(item.userId?.fullName||"Unknown")}
-        </p>
-        <p><strong>Phone:</strong>
-          ${escapeHtml(item.userId?.phone||"")}
-        </p>
-        <p>${escapeHtml(item.notes)}</p>
-        <p><strong>Status:</strong>
-          ${escapeHtml(item.status)}
-        </p>
-        <button onclick="reviewSubmission('${escapeHtml(item._id)}','Approved')">
-          Approve
-        </button>
-        <button class="danger" onclick="reviewSubmission('${escapeHtml(item._id)}','Rejected')">
-          Reject
-        </button>
-      </div>
-    `).join("");
-
-  }catch(err){
-    el("adminStats").textContent=err.message;
-    el("adminSubmissions").textContent="Could not load submissions.";
-  }
+try{
+const overview=await adminRequest("/api/admin/overview");
+$("adminStats").innerHTML=`
+<h3>Platform overview</h3>
+<p>Registered users: <strong>${escapeHtml(overview.totalUsers??overview.users??0)}</strong></p>
+<p>Task submissions: <strong>${escapeHtml(overview.totalSubmissions??overview.submissions??0)}</strong></p>
+<p>Pending reviews: <strong>${escapeHtml(overview.pendingSubmissions??overview.pending??0)}</strong></p>
+<p>Referred registrations: <strong>${escapeHtml(overview.totalReferrals??0)}</strong></p>`;
+const result=await adminRequest("/api/admin/submissions");
+const items=result.submissions||[];
+if(!items.length){$("adminSubmissions").textContent="No submissions yet.";return;}
+$("adminSubmissions").innerHTML=items.map((item,index)=>`
+<div class="hotel">
+<h3>${escapeHtml(item.taskName)}</h3>
+<p><strong>User:</strong> ${escapeHtml(item.userId?.fullName||"Unknown")}</p>
+<p><strong>Phone:</strong> ${escapeHtml(item.userId?.phone||"")}</p>
+<p>${escapeHtml(item.notes)}</p>
+<p><strong>Status:</strong> ${escapeHtml(item.status)}</p>
+<button data-review-index="${index}" data-status="Approved">Approve</button>
+<button class="danger" data-review-index="${index}" data-status="Rejected">Reject</button>
+</div>`).join("");
+$("adminSubmissions").querySelectorAll("button[data-review-index]").forEach(button=>{
+button.addEventListener("click",()=>{
+const item=items[Number(button.dataset.reviewIndex)];
+reviewSubmission(item._id,button.dataset.status);
+});
+});
+}catch(err){
+$("adminStats").textContent=err.message;
+$("adminSubmissions").textContent="Could not load submissions.";
+}
 }
 
-/* APPROVE OR REJECT SUBMISSION */
 async function reviewSubmission(id,status){
-  if(!confirm("Mark this submission as "+status+"?"))return;
-
-  try{
-    await adminRequest(
-      "/api/admin/submissions/"+encodeURIComponent(id),
-      {
-        method:"PATCH",
-        body:JSON.stringify({status})
-      }
-    );
-
-    alert("Submission updated.");
-    await loadAdmin();
-
-  }catch(err){
-    alert(err.message);
-  }
+if(!confirm("Mark this submission as "+status+"?"))return;
+try{
+await adminRequest("/api/admin/submissions/"+encodeURIComponent(id),{
+method:"PATCH",body:JSON.stringify({status})
+});
+alert("Submission updated.");
+await loadAdmin();
+}catch(err){alert(err.message);}
 }
 
-/* AUTOMATIC LOGIN IF ALREADY SIGNED IN */
-if(userToken){
-  loadDashboard();
-}else{
-  showAuth();
-}
+if(userToken)loadDashboard();
+else showAuth();
 </script>
 </body>
 </html>
