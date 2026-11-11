@@ -7,7 +7,7 @@ const crypto = require("crypto");
 const path = require("path");
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 const UserSchema = new mongoose.Schema({
@@ -18,6 +18,7 @@ const UserSchema = new mongoose.Schema({
   referralCode: { type: String, unique: true },
   referredBy: { type: String, default: "" },
   surveyAnswers: { type: [String], default: [] },
+  acceptedTaskRules: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -34,28 +35,28 @@ const User = mongoose.model("User", UserSchema);
 const TaskSubmission = mongoose.model("TaskSubmission", TaskSchema);
 
 const hotels = [
-"Sarova Stanley","Villa Rosa Kempinski","Fairmont The Norfolk",
-"Hemingways Nairobi","Tribe Hotel","The Boma Nairobi",
-"Radisson Blu Nairobi","Nairobi Serena Hotel","Ole Sereni","Eka Hotel",
-"Four Points Sheraton Airport","Crowne Plaza Nairobi Airport",
-"Glee Nairobi","Trademark Hotel","The Social House",
-"Movenpick Hotel Nairobi","Golden Tulip Westlands",
-"Best Western Meridian","PrideInn Azure","Panari Hotel",
-"Sarova Panafric","Weston Hotel","ibis Styles Nairobi",
-"Park Inn Radisson","Sankara Nairobi","Gem Forest Hotel",
-"Kwetu Nairobi","Enashipai Resort","Lake Naivasha Resort",
-"Lake Naivasha Sopa","Great Rift Valley Lodge","Sarova Lion Hill",
-"The Cliff Nakuru","Mbweha Camp","Sarova Woodlands",
-"Lake Elementaita Lodge","Lake Naivasha Country Club",
-"Mombasa Serena","Sarova Whitesands","Voyager Beach Resort",
-"PrideInn Paradise","Bamburi Beach Hotel","English Point Marina",
-"Severin Sea Lodge","Diani Reef","Leopard Beach Resort",
-"Baobab Beach Resort","Swahili Beach Resort","The Sands at Chale",
-"Pinewood Beach Resort","Almanara Resort","Southern Palms",
-"Kisumu Hotel","Acacia Premier Kisumu","Ciala Resort",
-"Sovereign Hotel Kisumu","Boma Inn Eldoret","Eka Hotel Eldoret",
-"Sirikwa Hotel","Fairmont Mount Kenya Safari Club",
-"Serena Mountain Lodge","Ark Lodge","Aberdare Country Club"
+  "Sarova Stanley", "Villa Rosa Kempinski", "Fairmont The Norfolk",
+  "Hemingways Nairobi", "Tribe Hotel", "The Boma Nairobi",
+  "Radisson Blu Nairobi", "Nairobi Serena Hotel", "Ole Sereni", "Eka Hotel",
+  "Four Points Sheraton Airport", "Crowne Plaza Nairobi Airport",
+  "Glee Nairobi", "Trademark Hotel", "The Social House",
+  "Movenpick Hotel Nairobi", "Golden Tulip Westlands",
+  "Best Western Meridian", "PrideInn Azure", "Panari Hotel",
+  "Sarova Panafric", "Weston Hotel", "ibis Styles Nairobi",
+  "Park Inn Radisson", "Sankara Nairobi", "Gem Forest Hotel",
+  "Kwetu Nairobi", "Enashipai Resort", "Lake Naivasha Resort",
+  "Lake Naivasha Sopa", "Great Rift Valley Lodge", "Sarova Lion Hill",
+  "The Cliff Nakuru", "Mbweha Camp", "Sarova Woodlands",
+  "Lake Elementaita Lodge", "Lake Naivasha Country Club",
+  "Mombasa Serena", "Sarova Whitesands", "Voyager Beach Resort",
+  "PrideInn Paradise", "Bamburi Beach Hotel", "English Point Marina",
+  "Severin Sea Lodge", "Diani Reef", "Leopard Beach Resort",
+  "Baobab Beach Resort", "Swahili Beach Resort", "The Sands at Chale",
+  "Pinewood Beach Resort", "Almanara Resort", "Southern Palms",
+  "Kisumu Hotel", "Acacia Premier Kisumu", "Ciala Resort",
+  "Sovereign Hotel Kisumu", "Boma Inn Eldoret", "Eka Hotel Eldoret",
+  "Sirikwa Hotel", "Fairmont Mount Kenya Safari Club",
+  "Serena Mountain Lodge", "Ark Lodge", "Aberdare Country Club"
 ].map((name, i) => ({
   id: "HOTEL-" + (i + 1),
   name
@@ -75,7 +76,7 @@ function createToken(data) {
 
   const signature = crypto.createHmac(
     "sha256",
-    process.env.TOKEN_SECRET || "temporary-secret"
+    process.env.TOKEN_SECRET
   ).update(body).digest("base64url");
 
   return body + "." + signature;
@@ -85,12 +86,21 @@ function verifyToken(req, role) {
   try {
     const token = (req.headers.authorization || "").replace("Bearer ", "");
     const [body, signature] = token.split(".");
+
+    if (!body || !signature || !process.env.TOKEN_SECRET) return null;
+
     const expected = crypto.createHmac(
       "sha256",
-      process.env.TOKEN_SECRET || "temporary-secret"
+      process.env.TOKEN_SECRET
     ).update(body).digest("base64url");
 
-    if (signature !== expected) return null;
+    const supplied = Buffer.from(signature);
+    const correct = Buffer.from(expected);
+
+    if (
+      supplied.length !== correct.length ||
+      !crypto.timingSafeEqual(supplied, correct)
+    ) return null;
 
     const data = JSON.parse(
       Buffer.from(body, "base64url").toString()
@@ -105,20 +115,28 @@ function verifyToken(req, role) {
 
 function userAuth(req, res, next) {
   const data = verifyToken(req, "user");
-  if (!data) return res.status(401).json({
-    success: false,
-    message: "Please sign in again."
-  });
+
+  if (!data) {
+    return res.status(401).json({
+      success: false,
+      message: "Please sign in again."
+    });
+  }
+
   req.userId = data.id;
   next();
 }
 
 function adminAuth(req, res, next) {
   const data = verifyToken(req, "admin");
-  if (!data) return res.status(401).json({
-    success: false,
-    message: "Admin login required."
-  });
+
+  if (!data) {
+    return res.status(401).json({
+      success: false,
+      message: "Admin login required."
+    });
+  }
+
   next();
 }
 
@@ -130,6 +148,7 @@ function safeUser(user) {
     county: user.county,
     referralCode: user.referralCode,
     referredBy: user.referredBy,
+    acceptedTaskRules: user.acceptedTaskRules,
     createdAt: user.createdAt
   };
 }
@@ -172,9 +191,13 @@ app.post("/api/signup", async (req, res) => {
     const referralCode =
       "LG" + crypto.randomBytes(4).toString("hex").toUpperCase();
 
-    const referredBy = String(req.body.referralCode || "").trim().toUpperCase();
+    const referredBy = String(req.body.referralCode || "")
+      .trim().toUpperCase();
 
-    if (referredBy && !(await User.findOne({ referralCode: referredBy }))) {
+    if (
+      referredBy &&
+      !(await User.findOne({ referralCode: referredBy }))
+    ) {
       return res.status(400).json({
         success: false,
         message: "Invalid referral code."
@@ -196,7 +219,7 @@ app.post("/api/signup", async (req, res) => {
       token: createToken({ role: "user", id: String(user._id) })
     });
   } catch (error) {
-    console.error(error);
+    console.error("Signup error:", error);
     res.status(500).json({
       success: false,
       message: "Signup failed. Please try again."
@@ -225,6 +248,7 @@ app.post("/api/login", async (req, res) => {
       token: createToken({ role: "user", id: String(user._id) })
     });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({
       success: false,
       message: "Login failed."
@@ -235,10 +259,13 @@ app.post("/api/login", async (req, res) => {
 app.get("/api/me", userAuth, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
-    if (!user) return res.status(404).json({
-      success: false,
-      message: "User not found."
-    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    }
 
     const submissions = await TaskSubmission.find({
       userId: user._id
@@ -251,6 +278,7 @@ app.get("/api/me", userAuth, async (req, res) => {
     res.json({
       success: true,
       user: safeUser(user),
+      acceptedTaskRules: user.acceptedTaskRules,
       submissions,
       referrals,
       wallet: {
@@ -260,6 +288,7 @@ app.get("/api/me", userAuth, async (req, res) => {
       }
     });
   } catch (error) {
+    console.error("Dashboard error:", error);
     res.status(500).json({
       success: false,
       message: "Could not load dashboard."
@@ -267,23 +296,89 @@ app.get("/api/me", userAuth, async (req, res) => {
   }
 });
 
-app.get("/api/tasks", userAuth, (req, res) => {
-  res.json({ success: true, tasks: hotels });
+/* TASK LIST: locked until the user accepts the research rules */
+app.get("/api/tasks", userAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    }
+
+    res.json({
+      success: true,
+      unlocked: user.acceptedTaskRules,
+      tasks: hotels.map(task => ({
+        ...task,
+        locked: !user.acceptedTaskRules
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Could not load tasks."
+    });
+  }
 });
 
-app.post("/api/tasks/:id/submit", userAuth, async (req, res) => {
+/* UNLOCK TASKS AFTER ACCEPTING THE RESEARCH RULES */
+app.post("/api/tasks/unlock", userAuth, async (req, res) => {
   try {
-    const task = hotels.find(t => t.id === req.params.id);
-    if (!task) return res.status(404).json({
-      success: false,
-      message: "Task not found."
+    if (req.body.acceptRules !== true) {
+      return res.status(400).json({
+        success: false,
+        message: "You must accept the research rules."
+      });
+    }
+
+    await User.findByIdAndUpdate(req.userId, {
+      acceptedTaskRules: true
     });
 
-    const notes = String(req.body.notes || "").trim();
-    if (notes.length < 30) return res.status(400).json({
-      success: false,
-      message: "Please enter at least 30 characters of research."
+    res.json({
+      success: true,
+      message: "Research rules accepted. Hotel tasks are now unlocked."
     });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Could not unlock tasks."
+    });
+  }
+});
+
+/* SUBMIT RESEARCH */
+app.post("/api/tasks/:id/submit", userAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user || !user.acceptedTaskRules) {
+      return res.status(403).json({
+        success: false,
+        message: "Accept the research rules before submitting tasks."
+      });
+    }
+
+    const task = hotels.find(t => t.id === req.params.id);
+
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found."
+      });
+    }
+
+    const notes = String(req.body.notes || "").trim();
+
+    if (notes.length < 30) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter at least 30 characters of research."
+      });
+    }
 
     const submission = await TaskSubmission.create({
       userId: req.userId,
@@ -295,9 +390,10 @@ app.post("/api/tasks/:id/submit", userAuth, async (req, res) => {
     res.json({
       success: true,
       submission,
-      message: "Research submitted for review. No cash reward is enabled in test mode."
+      message: "Research submitted for review. This platform is currently in test mode."
     });
   } catch (error) {
+    console.error("Submission error:", error);
     res.status(500).json({
       success: false,
       message: "Submission failed."
@@ -306,27 +402,44 @@ app.post("/api/tasks/:id/submit", userAuth, async (req, res) => {
 });
 
 app.post("/api/survey", userAuth, async (req, res) => {
-  const answers = req.body.answers;
+  try {
+    const answers = req.body.answers;
 
-  if (!Array.isArray(answers) || answers.length !== 10 ||
-      answers.some(a => !String(a).trim())) {
-    return res.status(400).json({
+    if (
+      !Array.isArray(answers) ||
+      answers.length !== 10 ||
+      answers.some(a => !String(a).trim())
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Answer all ten questions."
+      });
+    }
+
+    await User.findByIdAndUpdate(req.userId, {
+      surveyAnswers: answers
+    });
+
+    res.json({
+      success: true,
+      message: "Survey saved."
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message: "Answer all ten questions."
+      message: "Could not save survey."
     });
   }
-
-  await User.findByIdAndUpdate(req.userId, {
-    surveyAnswers: answers
-  });
-
-  res.json({
-    success: true,
-    message: "Survey saved. No cash reward is enabled in test mode."
-  });
 });
 
 app.post("/api/admin/login", (req, res) => {
+  if (!process.env.TOKEN_SECRET) {
+    return res.status(503).json({
+      success: false,
+      message: "Configure TOKEN_SECRET in Render."
+    });
+  }
+
   if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD) {
     return res.status(503).json({
       success: false,
@@ -334,8 +447,10 @@ app.post("/api/admin/login", (req, res) => {
     });
   }
 
-  if (req.body.username !== process.env.ADMIN_USERNAME ||
-      req.body.password !== process.env.ADMIN_PASSWORD) {
+  if (
+    req.body.username !== process.env.ADMIN_USERNAME ||
+    req.body.password !== process.env.ADMIN_PASSWORD
+  ) {
     return res.status(401).json({
       success: false,
       message: "Incorrect admin credentials."
@@ -349,53 +464,79 @@ app.post("/api/admin/login", (req, res) => {
 });
 
 app.get("/api/admin/overview", adminAuth, async (req, res) => {
-  const [users, submissions, pending] = await Promise.all([
-    User.countDocuments(),
-    TaskSubmission.countDocuments(),
-    TaskSubmission.countDocuments({ status: "Pending review" })
-  ]);
+  try {
+    const [users, submissions, pending] = await Promise.all([
+      User.countDocuments(),
+      TaskSubmission.countDocuments(),
+      TaskSubmission.countDocuments({ status: "Pending review" })
+    ]);
 
-  res.json({
-    success: true,
-    users,
-    submissions,
-    pending,
-    message: "Test mode. No payment or cash withdrawals."
-  });
+    res.json({
+      success: true,
+      users,
+      submissions,
+      pending,
+      totalUsers: users,
+      totalSubmissions: submissions,
+      pendingSubmissions: pending,
+      message: "Test mode. No payment or cash withdrawals are enabled."
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Could not load admin overview."
+    });
+  }
 });
 
 app.get("/api/admin/submissions", adminAuth, async (req, res) => {
-  const submissions = await TaskSubmission.find()
-    .populate("userId", "fullName phone")
-    .sort({ createdAt: -1 })
-    .limit(200);
+  try {
+    const submissions = await TaskSubmission.find()
+      .populate("userId", "fullName phone")
+      .sort({ createdAt: -1 })
+      .limit(200);
 
-  res.json({ success: true, submissions });
+    res.json({ success: true, submissions });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Could not load submissions."
+    });
+  }
 });
 
 app.patch("/api/admin/submissions/:id", adminAuth, async (req, res) => {
-  if (!["Approved", "Rejected"].includes(req.body.status)) {
-    return res.status(400).json({
+  try {
+    if (!["Approved", "Rejected"].includes(req.body.status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status."
+      });
+    }
+
+    const submission = await TaskSubmission.findByIdAndUpdate(
+      req.params.id,
+      { status: req.body.status },
+      { new: true }
+    );
+
+    if (!submission) {
+      return res.status(404).json({
+        success: false,
+        message: "Submission not found."
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Submission updated."
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message: "Invalid status."
+      message: "Could not update submission."
     });
   }
-
-  const submission = await TaskSubmission.findByIdAndUpdate(
-    req.params.id,
-    { status: req.body.status },
-    { new: true }
-  );
-
-  if (!submission) return res.status(404).json({
-    success: false,
-    message: "Submission not found."
-  });
-
-  res.json({
-    success: true,
-    message: "Submission updated. No cash reward is issued in test mode."
-  });
 });
 
 app.get("*", (req, res) => {
