@@ -23,14 +23,18 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .tab{background:#24517d}
 .hidden{display:none!important}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
-.hotel{border:1px solid #e0e6ee;border-radius:9px;padding:15px}
+.hotel{border:1px solid #e0e6ee;border-radius:9px;padding:15px;margin:10px 0}
 .muted{color:#65748a;font-size:14px}
-.notice{padding:12px;background:#eaf4ff;border-radius:8px;margin:10px 0}
+.notice{padding:14px;background:#eaf4ff;border-radius:8px;margin:10px 0}
+.rules{background:#fff8e8;border:1px solid #f0d89e;padding:16px;border-radius:9px;margin:14px 0}
 .error{color:#b83232}
 .success{color:#087b54}
 .stat{font-size:25px;font-weight:bold;color:#087b54}
 .small{font-size:13px}
 hr{border:0;border-top:1px solid #e6eaf0;margin:16px 0}
+.checkline{display:flex;align-items:flex-start;gap:10px;margin:15px 0}
+.checkline input{width:auto;margin:3px 0}
+a{color:#1764a5}
 </style>
 </head>
 <body>
@@ -61,7 +65,7 @@ hr{border:0;border-top:1px solid #e6eaf0;margin:16px 0}
       <input id="signupPassword" type="password" required minlength="6" placeholder="At least 6 characters">
       <label>Referral code (optional)</label>
       <input id="signupReferral" placeholder="Enter referral code">
-      <button type="submit">Create account</button>
+      <button type="submit" id="signupButton">Create account</button>
     </form>
     <p id="signupMessage"></p>
   </div>
@@ -73,7 +77,7 @@ hr{border:0;border-top:1px solid #e6eaf0;margin:16px 0}
       <input id="loginPhone" required placeholder="07XXXXXXXX">
       <label>Password</label>
       <input id="loginPassword" type="password" required>
-      <button type="submit">Sign in</button>
+      <button type="submit" id="loginButton">Sign in</button>
     </form>
     <p id="loginMessage"></p>
   </div>
@@ -99,10 +103,22 @@ hr{border:0;border-top:1px solid #e6eaf0;margin:16px 0}
       </div>
       <button class="danger" onclick="logout()">Log out</button>
     </div>
+
     <div class="grid">
-      <div class="notice"><div class="muted">Wallet balance</div><div class="stat">KSh 0</div><div class="small">Test mode</div></div>
-      <div class="notice"><div class="muted">Referral code</div><strong id="myReferral">—</strong><br><button class="secondary" onclick="copyReferral()">Copy code</button></div>
-      <div class="notice"><div class="muted">Task submissions</div><div class="stat" id="submissionCount">0</div></div>
+      <div class="notice">
+        <div class="muted">Wallet balance</div>
+        <div class="stat">KSh 0</div>
+        <div class="small">Test mode</div>
+      </div>
+      <div class="notice">
+        <div class="muted">Referral code</div>
+        <strong id="myReferral">—</strong><br>
+        <button class="secondary" onclick="copyReferral()">Copy code</button>
+      </div>
+      <div class="notice">
+        <div class="muted">Task submissions</div>
+        <div class="stat" id="submissionCount">0</div>
+      </div>
     </div>
     <p class="small muted">This is currently a test platform. No cash earnings, payment collection, or withdrawals are enabled. Task submissions are for research and review.</p>
   </div>
@@ -115,7 +131,26 @@ hr{border:0;border-top:1px solid #e6eaf0;margin:16px 0}
 
   <div id="tasksPanel" class="card">
     <h2>Available hotel research tasks</h2>
-    <p class="muted">Research a hotel and submit factual information. Do not claim to have visited a hotel if you have not.</p>
+    <p class="muted">Research hotels and submit accurate information. Do not claim to have visited a hotel if you have not.</p>
+
+    <div id="taskRulesPanel" class="rules hidden">
+      <h3>Before accessing research tasks</h3>
+      <p>Please read and accept these research rules:</p>
+      <ul>
+        <li>Submit accurate and honest information.</li>
+        <li>Do not copy another researcher's submission.</li>
+        <li>Do not claim personal hotel visits that did not happen.</li>
+        <li>Submissions may be reviewed by the platform administrator.</li>
+        <li>Accepting these rules does not require a payment.</li>
+      </ul>
+      <label class="checkline">
+        <input type="checkbox" id="acceptRulesCheckbox">
+        <span>I have read and agree to follow the research rules.</span>
+      </label>
+      <button id="unlockTasksButton" onclick="unlockTasks()">Accept rules and unlock tasks</button>
+      <p id="unlockMessage"></p>
+    </div>
+
     <div id="tasksList">Loading tasks...</div>
   </div>
 
@@ -154,97 +189,189 @@ let userToken = localStorage.getItem("lg_user_token") || "";
 let currentUser = null;
 let adminToken = "";
 
-function el(id){return document.getElementById(id)}
+function el(id){
+  return document.getElementById(id);
+}
+
 function message(id,text,type="error"){
   el(id).textContent=text;
   el(id).className=type;
 }
+
 function escapeHtml(value){
   return String(value ?? "").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
   }[c]));
 }
+
 async function request(path,options={}){
-  const headers={"Content-Type":"application/json",...(options.headers||{})};
-  if(userToken) headers.Authorization="Bearer "+userToken;
+  const headers={
+    "Content-Type":"application/json",
+    ...(options.headers||{})
+  };
+
+  if(userToken){
+    headers.Authorization="Bearer "+userToken;
+  }
+
   const response=await fetch(API+path,{...options,headers});
-  const data=await response.json().catch(()=>({message:"Invalid server response"}));
-  if(!response.ok) throw new Error(data.message||"Request failed");
+  const data=await response.json().catch(()=>({
+    message:"Invalid server response"
+  }));
+
+  if(!response.ok){
+    throw new Error(data.message||data.error||"Request failed");
+  }
+
   return data;
 }
+
 function showAuth(){
   el("authSection").classList.remove("hidden");
   el("dashboard").classList.add("hidden");
   el("adminSection").classList.add("hidden");
   el("headerRight").textContent="Hotel Research Platform";
 }
+
 function showDashboard(){
   el("authSection").classList.add("hidden");
   el("dashboard").classList.remove("hidden");
   el("adminSection").classList.add("hidden");
   el("headerRight").textContent="Member dashboard";
 }
+
 function showPanel(id){
-  ["tasksPanel","historyPanel","surveyPanel"].forEach(x=>el(x).classList.add("hidden"));
+  ["tasksPanel","historyPanel","surveyPanel"].forEach(x=>{
+    el(x).classList.add("hidden");
+  });
   el(id).classList.remove("hidden");
 }
+
 function logout(){
   userToken="";
   currentUser=null;
   localStorage.removeItem("lg_user_token");
   showAuth();
 }
+
 function adminLogout(){
   adminToken="";
   el("adminSection").classList.add("hidden");
   showAuth();
 }
+
 function copyReferral(){
   const code=el("myReferral").textContent;
-  if(code && code!=="—") navigator.clipboard.writeText(code).then(()=>alert("Referral code copied")).catch(()=>alert("Copy failed"));
+
+  if(code && code!=="—"){
+    navigator.clipboard.writeText(code)
+      .then(()=>alert("Referral code copied"))
+      .catch(()=>alert("Copy failed"));
+  }
 }
 
+/* SIGN UP */
 el("signupForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  message("signupMessage","Creating account...","muted");
+
+  const button=el("signupButton");
+  button.disabled=true;
+  button.textContent="Creating account...";
+  message("signupMessage","Please wait...","muted");
+
   try{
-    const data=await request("/api/signup",{method:"POST",body:JSON.stringify({
-      fullName:el("signupName").value.trim(),
-      county:el("signupCounty").value,
-      phone:el("signupPhone").value.trim(),
-      password:el("signupPassword").value,
-      referralCode:el("signupReferral").value.trim()
-    })});
+    const data=await request("/api/signup",{
+      method:"POST",
+      body:JSON.stringify({
+        fullName:el("signupName").value.trim(),
+        county:el("signupCounty").value,
+        phone:el("signupPhone").value.trim(),
+        password:el("signupPassword").value,
+        referralCode:el("signupReferral").value.trim()
+      })
+    });
+
+    if(!data.token){
+      throw new Error("Account created but no login token was returned. Please sign in.");
+    }
+
     userToken=data.token;
     localStorage.setItem("lg_user_token",userToken);
+
     await loadDashboard();
-  }catch(err){message("signupMessage",err.message)}
+  }catch(err){
+    message("signupMessage",err.message);
+  }finally{
+    button.disabled=false;
+    button.textContent="Create account";
+  }
 });
 
+/* SIGN IN */
 el("loginForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  message("loginMessage","Signing in...","muted");
+
+  const button=el("loginButton");
+  button.disabled=true;
+  button.textContent="Signing in...";
+  message("loginMessage","Please wait...","muted");
+
   try{
-    const data=await request("/api/login",{method:"POST",body:JSON.stringify({
-      phone:el("loginPhone").value.trim(),
-      password:el("loginPassword").value
-    })});
+    const data=await request("/api/login",{
+      method:"POST",
+      body:JSON.stringify({
+        phone:el("loginPhone").value.trim(),
+        password:el("loginPassword").value
+      })
+    });
+
+    if(!data.token){
+      throw new Error("The server did not return a login token.");
+    }
+
     userToken=data.token;
     localStorage.setItem("lg_user_token",userToken);
+
     await loadDashboard();
-  }catch(err){message("loginMessage",err.message)}
+  }catch(err){
+    message("loginMessage",err.message);
+  }finally{
+    button.disabled=false;
+    button.textContent="Sign in";
+  }
 });
 
+/* LOAD MEMBER DASHBOARD */
 async function loadDashboard(){
   try{
     const data=await request("/api/me");
+
     currentUser=data.user;
+
+    if(!currentUser){
+      throw new Error("User information was not returned.");
+    }
+
     showDashboard();
-    el("welcomeName").textContent="Welcome, "+(currentUser.fullName||"Member");
-    el("profileDetails").textContent=(currentUser.phone||"")+" • "+(currentUser.county||"");
-    el("myReferral").textContent=currentUser.referralCode||"Not assigned";
-    el("submissionCount").textContent=(data.submissions||[]).length;
+
+    el("welcomeName").textContent=
+      "Welcome, "+(currentUser.fullName||"Member");
+
+    el("profileDetails").textContent=
+      (currentUser.phone||"")+" • "+(currentUser.county||"");
+
+    el("myReferral").textContent=
+      currentUser.referralCode||"Not assigned";
+
+    el("submissionCount").textContent=
+      (data.submissions||[]).length;
+
     renderHistory(data.submissions||[]);
+
     await loadTasks();
   }catch(err){
     logout();
@@ -252,60 +379,154 @@ async function loadDashboard(){
   }
 }
 
+/* TASK RULE ACCEPTANCE */
+async function unlockTasks(){
+  const checkbox=el("acceptRulesCheckbox");
+  const button=el("unlockTasksButton");
+
+  if(!checkbox.checked){
+    message("unlockMessage","Please tick the box to confirm that you accept the research rules.");
+    return;
+  }
+
+  button.disabled=true;
+  button.textContent="Please wait...";
+  message("unlockMessage","Saving your acceptance...","muted");
+
+  try{
+    await request("/api/tasks/unlock",{
+      method:"POST",
+      body:JSON.stringify({acceptRules:true})
+    });
+
+    if(currentUser){
+      currentUser.acceptedTaskRules=true;
+    }
+
+    message("unlockMessage","Rules accepted. Loading tasks...","success");
+    await loadTasks();
+  }catch(err){
+    message("unlockMessage",err.message);
+  }finally{
+    button.disabled=false;
+    button.textContent="Accept rules and unlock tasks";
+  }
+}
+
+/* LOAD HOTEL TASKS */
 async function loadTasks(){
   const box=el("tasksList");
+  const rulesPanel=el("taskRulesPanel");
+
   box.textContent="Loading tasks...";
+
   try{
     const data=await request("/api/tasks");
     const tasks=data.tasks||[];
-    if(!tasks.length){box.textContent="No tasks are available yet.";return}
+
+    const unlocked=
+      data.unlocked===true ||
+      (currentUser && currentUser.acceptedTaskRules===true);
+
+    if(!unlocked){
+      rulesPanel.classList.remove("hidden");
+      box.innerHTML=
+        '<div class="notice">Hotel research tasks are locked until you accept the research rules above.</div>';
+      return;
+    }
+
+    rulesPanel.classList.add("hidden");
+
+    if(!tasks.length){
+      box.textContent="No tasks are available yet.";
+      return;
+    }
+
     box.innerHTML='<div class="grid">'+tasks.map(task=>`
       <div class="hotel">
         <h3>${escapeHtml(task.name)}</h3>
         <p class="muted">Hotel research task</p>
-        <button onclick="submitTask('${escapeHtml(task.id)}','${escapeHtml(task.name).replace(/'/g,"&#39;")}')">Submit research</button>
-      </div>`).join("")+'</div>';
-  }catch(err){box.textContent=err.message}
+        <button onclick="submitTask('${escapeHtml(task.id)}','${escapeHtml(task.name).replace(/'/g,"&#39;")}')">
+          Submit research
+        </button>
+      </div>
+    `).join("")+'</div>';
+
+  }catch(err){
+    box.textContent=err.message;
+  }
 }
 
+/* SUBMIT RESEARCH */
 async function submitTask(id,name){
-  const notes=prompt("Write your factual research about "+name+". Include useful details and at least 30 characters:");
+  const notes=prompt(
+    "Write your factual research about "+name+
+    ". Include useful details and at least 30 characters:"
+  );
+
   if(notes===null)return;
-  if(notes.trim().length<30){alert("Please enter at least 30 characters.");return}
+
+  if(notes.trim().length<30){
+    alert("Please enter at least 30 characters.");
+    return;
+  }
+
   try{
-    const data=await request("/api/tasks/"+encodeURIComponent(id)+"/submit",{
-      method:"POST",body:JSON.stringify({notes:notes.trim()})
-    });
+    const data=await request(
+      "/api/tasks/"+encodeURIComponent(id)+"/submit",
+      {
+        method:"POST",
+        body:JSON.stringify({notes:notes.trim()})
+      }
+    );
+
     alert(data.message||"Submission received for review.");
+
     await loadDashboard();
     showPanel("historyPanel");
-  }catch(err){alert(err.message)}
+
+  }catch(err){
+    alert(err.message);
+  }
 }
 
+/* SUBMISSION HISTORY */
 function renderHistory(items){
   const box=el("historyList");
-  if(!items.length){box.textContent="You have not submitted any tasks yet.";return}
+
+  if(!items.length){
+    box.textContent="You have not submitted any tasks yet.";
+    return;
+  }
+
   box.innerHTML=items.map(item=>`
     <div class="hotel">
       <strong>${escapeHtml(item.taskName||"Research task")}</strong>
       <p>${escapeHtml(item.notes||"")}</p>
-      <p class="muted">Status: ${escapeHtml(item.status||"Pending review")}</p>
-      <p class="small muted">${item.createdAt?new Date(item.createdAt).toLocaleString():""}</p>
-    </div>`).join("");
+      <p class="muted">
+        Status: ${escapeHtml(item.status||"Pending review")}
+      </p>
+      <p class="small muted">
+        ${item.createdAt?new Date(item.createdAt).toLocaleString():""}
+      </p>
+    </div>
+  `).join("");
 }
 
+/* WELCOME SURVEY */
 const questions=[
- "Which county do you live in?",
- "What type of hotel interests you most?",
- "Do you prefer budget, mid-range, or luxury hotels?",
- "Which part of Kenya would you like to research?",
- "What information about hotels is most useful to travellers?",
- "Do you usually research hotels online?",
- "Which facilities matter most to hotel guests?",
- "Would you like to research restaurants too?",
- "How much time can you spend on research tasks?",
- "What would make this research platform more useful?"
+  "Which county do you live in?",
+  "What type of hotel interests you most?",
+  "Do you prefer budget, mid-range, or luxury hotels?",
+  "Which part of Kenya would you like to research?",
+  "What information about hotels is most useful to travellers?",
+  "Do you usually research hotels online?",
+  "Which facilities matter most to hotel guests?",
+  "Would you like to research restaurants too?",
+  "How much time can you spend on research tasks?",
+  "What would make this research platform more useful?"
 ];
+
 el("surveyQuestions").innerHTML=questions.map((q,i)=>`
   <label>${i+1}. ${escapeHtml(q)}</label>
   <input name="answer" required maxlength="500" placeholder="Your answer">
@@ -313,35 +534,68 @@ el("surveyQuestions").innerHTML=questions.map((q,i)=>`
 
 el("surveyForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  const answers=[...el("surveyForm").querySelectorAll('input[name="answer"]')].map(x=>x.value.trim());
+
+  const answers=[
+    ...el("surveyForm").querySelectorAll('input[name="answer"]')
+  ].map(x=>x.value.trim());
+
   try{
-    const data=await request("/api/survey",{method:"POST",body:JSON.stringify({answers})});
-    message("surveyMessage",data.message||"Survey submitted successfully.","success");
-  }catch(err){message("surveyMessage",err.message)}
+    const data=await request("/api/survey",{
+      method:"POST",
+      body:JSON.stringify({answers})
+    });
+
+    message(
+      "surveyMessage",
+      data.message||"Survey submitted successfully.",
+      "success"
+    );
+  }catch(err){
+    message("surveyMessage",err.message);
+  }
 });
 
+/* ADMIN LOGIN */
 el("adminLoginForm").addEventListener("submit",async e=>{
   e.preventDefault();
+
   message("adminLoginMessage","Signing in...","muted");
+
   try{
     const response=await fetch(API+"/api/admin/login",{
-      method:"POST",headers:{"Content-Type":"application/json"},
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         username:el("adminUsername").value.trim(),
         password:el("adminPassword").value
       })
     });
+
     const data=await response.json();
-    if(!response.ok)throw new Error(data.message||"Admin login failed");
+
+    if(!response.ok){
+      throw new Error(data.message||"Admin login failed");
+    }
+
     adminToken=data.token;
+
+    if(!adminToken){
+      throw new Error("Admin login did not return a token.");
+    }
+
     el("authSection").classList.add("hidden");
     el("dashboard").classList.add("hidden");
     el("adminSection").classList.remove("hidden");
     el("headerRight").textContent="Administrator";
+
     await loadAdmin();
-  }catch(err){message("adminLoginMessage",err.message)}
+
+  }catch(err){
+    message("adminLoginMessage",err.message);
+  }
 });
 
+/* ADMIN REQUESTS */
 async function adminRequest(path,options={}){
   const response=await fetch(API+path,{
     ...options,
@@ -351,51 +605,99 @@ async function adminRequest(path,options={}){
       ...(options.headers||{})
     }
   });
-  const data=await response.json().catch(()=>({message:"Invalid response"}));
-  if(!response.ok)throw new Error(data.message||"Admin request failed");
+
+  const data=await response.json().catch(()=>({
+    message:"Invalid response"
+  }));
+
+  if(!response.ok){
+    throw new Error(data.message||"Admin request failed");
+  }
+
   return data;
 }
 
+/* ADMIN DASHBOARD */
 async function loadAdmin(){
   try{
     const overview=await adminRequest("/api/admin/overview");
+
     el("adminStats").innerHTML=`
       <h3>Platform overview</h3>
-      <p>Registered users: <strong>${escapeHtml(overview.totalUsers??0)}</strong></p>
-      <p>Task submissions: <strong>${escapeHtml(overview.totalSubmissions??0)}</strong></p>
-      <p>Pending reviews: <strong>${escapeHtml(overview.pendingSubmissions??0)}</strong></p>`;
+      <p>Registered users:
+        <strong>${escapeHtml(overview.totalUsers??overview.users??0)}</strong>
+      </p>
+      <p>Task submissions:
+        <strong>${escapeHtml(overview.totalSubmissions??overview.submissions??0)}</strong>
+      </p>
+      <p>Pending reviews:
+        <strong>${escapeHtml(overview.pendingSubmissions??overview.pending??0)}</strong>
+      </p>
+    `;
+
     const result=await adminRequest("/api/admin/submissions");
     const items=result.submissions||[];
-    if(!items.length){el("adminSubmissions").textContent="No submissions yet.";return}
+
+    if(!items.length){
+      el("adminSubmissions").textContent="No submissions yet.";
+      return;
+    }
+
     el("adminSubmissions").innerHTML=items.map(item=>`
       <div class="hotel">
         <h3>${escapeHtml(item.taskName)}</h3>
-        <p><strong>User:</strong> ${escapeHtml(item.userId?.fullName||"Unknown")}</p>
-        <p><strong>Phone:</strong> ${escapeHtml(item.userId?.phone||"")}</p>
+        <p><strong>User:</strong>
+          ${escapeHtml(item.userId?.fullName||"Unknown")}
+        </p>
+        <p><strong>Phone:</strong>
+          ${escapeHtml(item.userId?.phone||"")}
+        </p>
         <p>${escapeHtml(item.notes)}</p>
-        <p><strong>Status:</strong> ${escapeHtml(item.status)}</p>
-        <button onclick="reviewSubmission('${escapeHtml(item._id)}','Approved')">Approve</button>
-        <button class="danger" onclick="reviewSubmission('${escapeHtml(item._id)}','Rejected')">Reject</button>
-      </div>`).join("");
+        <p><strong>Status:</strong>
+          ${escapeHtml(item.status)}
+        </p>
+        <button onclick="reviewSubmission('${escapeHtml(item._id)}','Approved')">
+          Approve
+        </button>
+        <button class="danger" onclick="reviewSubmission('${escapeHtml(item._id)}','Rejected')">
+          Reject
+        </button>
+      </div>
+    `).join("");
+
   }catch(err){
     el("adminStats").textContent=err.message;
     el("adminSubmissions").textContent="Could not load submissions.";
   }
 }
 
+/* APPROVE OR REJECT SUBMISSION */
 async function reviewSubmission(id,status){
   if(!confirm("Mark this submission as "+status+"?"))return;
+
   try{
-    await adminRequest("/api/admin/submissions/"+encodeURIComponent(id),{
-      method:"PATCH",body:JSON.stringify({status})
-    });
+    await adminRequest(
+      "/api/admin/submissions/"+encodeURIComponent(id),
+      {
+        method:"PATCH",
+        body:JSON.stringify({status})
+      }
+    );
+
     alert("Submission updated.");
     await loadAdmin();
-  }catch(err){alert(err.message)}
+
+  }catch(err){
+    alert(err.message);
+  }
 }
 
-if(userToken)loadDashboard();
-else showAuth();
+/* AUTOMATIC LOGIN IF ALREADY SIGNED IN */
+if(userToken){
+  loadDashboard();
+}else{
+  showAuth();
+}
 </script>
 </body>
 </html>
