@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const path = require("path");
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -69,6 +70,10 @@ function normalizePhone(phone) {
 }
 
 function createToken(data) {
+  if (!process.env.TOKEN_SECRET) {
+    throw new Error("TOKEN_SECRET is not configured.");
+  }
+
   const body = Buffer.from(JSON.stringify({
     ...data,
     expires: Date.now() + 7 * 86400000
@@ -158,10 +163,11 @@ app.get("/api/health", (req, res) => {
     success: true,
     database: mongoose.connection.readyState === 1
       ? "Connected" : "Connecting",
-    mode: "TEST MODE"
+    mode: "TEST MODE - payments not configured"
   });
 });
 
+/* CREATE ACCOUNT */
 app.post("/api/signup", async (req, res) => {
   try {
     const { fullName, county, password } = req.body;
@@ -194,18 +200,19 @@ app.post("/api/signup", async (req, res) => {
     const referredBy = String(req.body.referralCode || "")
       .trim().toUpperCase();
 
-    if (
-      referredBy &&
-      !(await User.findOne({ referralCode: referredBy }))
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid referral code."
-      });
+    if (referredBy) {
+      const referrer = await User.findOne({ referralCode: referredBy });
+
+      if (!referrer) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid referral code."
+        });
+      }
     }
 
     const user = await User.create({
-      fullName,
+      fullName: String(fullName).trim(),
       phone,
       county,
       passwordHash: await bcrypt.hash(password, 12),
@@ -227,6 +234,7 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
+/* MEMBER LOGIN */
 app.post("/api/login", async (req, res) => {
   try {
     const phone = normalizePhone(req.body.phone);
@@ -256,6 +264,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+/* MEMBER DASHBOARD */
 app.get("/api/me", userAuth, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -284,7 +293,9 @@ app.get("/api/me", userAuth, async (req, res) => {
       wallet: {
         balance: 0,
         earned: 0,
-        message: "Test mode. Cash earnings are not enabled."
+        transactions: [],
+        status: "Not connected",
+        message: "Real deposits and withdrawals are not enabled yet."
       }
     });
   } catch (error) {
@@ -296,7 +307,82 @@ app.get("/api/me", userAuth, async (req, res) => {
   }
 });
 
-/* TASK LIST: locked until the user accepts the research rules */
+/* PERSONAL REFERRAL PAGE */
+app.get("/api/referrals", userAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    }
+
+    const invitedUsers = await User.find({
+      referredBy: user.referralCode
+    })
+      .select("fullName county createdAt")
+      .sort({ createdAt: -1 });
+
+    const baseUrl = (
+      process.env.APP_URL ||
+      `${req.protocol}://${req.get("host")}`
+    ).replace(/\/+$/, "");
+
+    const referralLink =
+      `${baseUrl}/?ref=${encodeURIComponent(user.referralCode)}`;
+
+    res.json({
+      success: true,
+      referralCode: user.referralCode,
+      referralLink,
+      totalReferrals: invitedUsers.length,
+      referrals: invitedUsers.map(person => ({
+        fullName: person.fullName,
+        county: person.county,
+        joinedAt: person.createdAt
+      }))
+    });
+  } catch (error) {
+    console.error("Referral error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Could not load your referrals."
+    });
+  }
+});
+
+/* WALLET DETAILS */
+app.get("/api/wallet", userAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    }
+
+    res.json({
+      success: true,
+      balance: 0,
+      currency: "KES",
+      transactions: [],
+      paymentStatus: "Not configured",
+      message: "Wallet payments and withdrawals are not active yet."
+    });
+  } catch (error) {
+    console.error("Wallet error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Could not load wallet."
+    });
+  }
+});
+
+/* HOTEL TASK LIST */
 app.get("/api/tasks", userAuth, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -324,7 +410,7 @@ app.get("/api/tasks", userAuth, async (req, res) => {
   }
 });
 
-/* UNLOCK TASKS AFTER ACCEPTING THE RESEARCH RULES */
+/* ACCEPT RESEARCH RULES */
 app.post("/api/tasks/unlock", userAuth, async (req, res) => {
   try {
     if (req.body.acceptRules !== true) {
@@ -390,7 +476,7 @@ app.post("/api/tasks/:id/submit", userAuth, async (req, res) => {
     res.json({
       success: true,
       submission,
-      message: "Research submitted for review. This platform is currently in test mode."
+      message: "Research submitted for review."
     });
   } catch (error) {
     console.error("Submission error:", error);
@@ -401,6 +487,7 @@ app.post("/api/tasks/:id/submit", userAuth, async (req, res) => {
   }
 });
 
+/* WELCOME SURVEY */
 app.post("/api/survey", userAuth, async (req, res) => {
   try {
     const answers = req.body.answers;
@@ -432,6 +519,7 @@ app.post("/api/survey", userAuth, async (req, res) => {
   }
 });
 
+/* ADMIN LOGIN */
 app.post("/api/admin/login", (req, res) => {
   if (!process.env.TOKEN_SECRET) {
     return res.status(503).json({
@@ -463,12 +551,14 @@ app.post("/api/admin/login", (req, res) => {
   });
 });
 
+/* ADMIN OVERVIEW */
 app.get("/api/admin/overview", adminAuth, async (req, res) => {
   try {
-    const [users, submissions, pending] = await Promise.all([
+    const [users, submissions, pending, referralCount] = await Promise.all([
       User.countDocuments(),
       TaskSubmission.countDocuments(),
-      TaskSubmission.countDocuments({ status: "Pending review" })
+      TaskSubmission.countDocuments({ status: "Pending review" }),
+      User.countDocuments({ referredBy: { $ne: "" } })
     ]);
 
     res.json({
@@ -479,7 +569,8 @@ app.get("/api/admin/overview", adminAuth, async (req, res) => {
       totalUsers: users,
       totalSubmissions: submissions,
       pendingSubmissions: pending,
-      message: "Test mode. No payment or cash withdrawals are enabled."
+      totalReferrals: referralCount,
+      message: "Payment processing is not configured."
     });
   } catch (error) {
     res.status(500).json({
@@ -489,6 +580,7 @@ app.get("/api/admin/overview", adminAuth, async (req, res) => {
   }
 });
 
+/* ADMIN SUBMISSIONS */
 app.get("/api/admin/submissions", adminAuth, async (req, res) => {
   try {
     const submissions = await TaskSubmission.find()
@@ -505,6 +597,7 @@ app.get("/api/admin/submissions", adminAuth, async (req, res) => {
   }
 });
 
+/* ADMIN APPROVE OR REJECT */
 app.patch("/api/admin/submissions/:id", adminAuth, async (req, res) => {
   try {
     if (!["Approved", "Rejected"].includes(req.body.status)) {
@@ -539,6 +632,7 @@ app.patch("/api/admin/submissions/:id", adminAuth, async (req, res) => {
   }
 });
 
+/* FRONTEND */
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
